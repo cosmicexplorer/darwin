@@ -58,7 +58,7 @@ Typically, the workflow goes something like:
 
 ##### Pitfalls
 
-Unfortunately, the software is far from completion. However, most of its functionality can be done manually with knowledge of git and dwndiff. You can review the documentation for dwndiff by running
+The software, and especially the interface, is not yet complete. However, most of its functionality can be felt out with knowledge of git and dwndiff. You can review the documentation for dwndiff by running
 ```
 dwndiff --help
 ```
