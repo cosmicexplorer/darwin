@@ -1,7 +1,7 @@
 darwin
 ======
 
-Track changes as a genome evolves over time (hence the name).
+Track changes as a genome evolves over time (hence the name). More information and project page on the [igem wiki](http://2014.igem.org/Team:Vanderbilt_Software).
 
 #### Build
 
