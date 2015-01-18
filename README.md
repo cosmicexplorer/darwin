@@ -42,7 +42,7 @@ Once the remote has been set up, though, the process is relatively simple. As wi
 ```
 darwin clone git <remote url>
 ```
-This will clone the remote repository and all its files to your directory. For all fasta files in the repository, darwin will automatically unzip them from the intermediate format in the .dwn folder and palce them into the present working directory.
+This will clone the remote repository and all its files to your directory. For all fasta files in the repository, darwin will automatically unzip them from the intermediate format in the .dwn folder and place them into the present working directory.
 
 
 ##### Usage

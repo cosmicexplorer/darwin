@@ -13,3 +13,6 @@ bin/*.o
 .sconsign.dblite
 # current names of binaries
 dwndiff
+# images for documentation
+*.svg
+*.png
