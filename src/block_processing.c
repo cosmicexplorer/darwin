@@ -162,10 +162,13 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
   output_block->readable_bytes = 0;
   for (unsigned long long codon_index = 0;
        codon_index < input_block->readable_bytes; ++codon_index) {
-    current_codon_frame[ CODON_LENGTH - 1 ] =
-     input_block->string[ codon_index ];
     // first base is only null at start/end of ORF or at beginning
     if ('\0' != current_codon_frame[ 0 ]) {
+      if (current_codon_frame[ 0 ] != 'A' && current_codon_frame[ 0 ] != 'G' &&
+          current_codon_frame[ 0 ] != 'C' && current_codon_frame[ 0 ] != 'T' &&
+          current_codon_frame[ 0 ] != '\n') {
+        fprintf(stderr, "%c\n", current_codon_frame[ 0 ]);
+      }
       if (*is_within_comment) {
         // terminate comments at end of line
         if (NEWLINE == current_codon_frame[ 0 ]) {
@@ -175,8 +178,8 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
          current_codon_frame[ 0 ];
         ++output_block->readable_bytes;
       } else if ('>' == current_codon_frame[ 0 ]) {
+        PRINT_ERROR("yo lol");
         *is_within_comment = true;
-        *is_within_orf = false;
         output_block->string[ output_block->readable_bytes ] = NEWLINE;
         ++output_block->readable_bytes;
         output_block->string[ output_block->readable_bytes ] = NEWLINE;
@@ -239,6 +242,15 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
       current_codon_frame[ base_index ] = current_codon_frame[ base_index + 1 ];
     }
     current_codon_frame[ CODON_LENGTH - 1 ] = '\0'; // nullify final
+    while (codon_index + 1 < input_block->readable_bytes) {
+      if (NEWLINE != input_block->string[ codon_index + 1 ]) {
+        current_codon_frame[ CODON_LENGTH - 1 ] =
+         input_block->string[ codon_index + 1 ];
+        break;
+      } else {
+        ++codon_index;
+      }
+    }
     // leaves first two codons in current_codon_frame pointer for next block
   }
 
@@ -326,8 +338,8 @@ void concurrent_read_and_process_block_vcsfmt(
   g_mutex_unlock(args->process_complete_mutex);
 }
 
-void
- concurrent_write_block_vcsfmt(concurrent_read_write_block_args_vcsfmt * args) {
+void concurrent_write_block_vcsfmt(
+ concurrent_read_write_block_args_vcsfmt * args) {
   while (!is_processing_complete_vcsfmt_concurrent(args)) {
     g_mutex_unlock(args->process_complete_mutex);
     args->active_block =

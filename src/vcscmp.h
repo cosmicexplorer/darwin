@@ -121,7 +121,7 @@ typedef struct {
 // modify LINES_ABOVE_BELOW_TO_SEARCH, not QUEUE_HASH_CRITICAL_SIZE
 #define LINES_ABOVE_BELOW_TO_SEARCH 5
 // size of queue wrt # of lines
-#define QUEUE_HASH_CRITICAL_SIZE 2 * LINES_ABOVE_BELOW_TO_SEARCH + 1
+#define QUEUE_HASH_CRITICAL_SIZE (2 * LINES_ABOVE_BELOW_TO_SEARCH + 1)
 
 /* set boolean to true if line_ids in arguments match
  * @prev_line_id line_id of some line in prev file

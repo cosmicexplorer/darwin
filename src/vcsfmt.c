@@ -2,7 +2,7 @@
 #include "block_processing.h" // for vcsfmt functions
 
 // VCSFMT
-void vcsfmt(char * filename, char * output_directory) {
+void vcsfmt(char * filename, char * output_file_path) {
   FILE * input_file = open_file_read(filename);
   if (NULL == input_file) {
     printf("Error in creating input file.\n");
@@ -15,11 +15,12 @@ void vcsfmt(char * filename, char * output_directory) {
   strcpy(output_file_name, filename);
   strcat(output_file_name, OUTPUT_SUFFIX);
 
-  char * full_out_file_path = malloc(
-   sizeof(char) * (strlen(output_directory) + strlen(output_file_name) + 2));
-  strcpy(full_out_file_path, output_directory);
-  strcat(full_out_file_path, "/");
-  strcat(full_out_file_path, output_file_name);
+  char * full_out_file_path;
+  if (strcmp(output_file_path, "") != 0) {
+    full_out_file_path = output_file_path;
+  } else {
+    full_out_file_path = output_file_name;
+  }
   FILE * output_file = create_file_binary_write(full_out_file_path);
   PRINT_ERROR_AND_RETURN_IF_NULL(output_file, "Error in creating output file.");
 
@@ -114,12 +115,9 @@ void vcsfmt(char * filename, char * output_directory) {
 }
 
 // DE_VCSFMT
-void de_vcsfmt(char * filename, char * output_directory) {
+void de_vcsfmt(char * filename, char * output_file_path) {
   FILE * input_file = open_file_read(filename);
-  if (NULL == input_file) {
-    printf("Error in creating input file.\n");
-    return;
-  }
+  PRINT_ERROR_AND_RETURN_IF_NULL(input_file, "Error in creating input file.");
   // create filename long enough to concatenate filename and suffix
   // assume filename ends in .vcsfmt (7 chars)
   char * output_file_name =
@@ -127,11 +125,12 @@ void de_vcsfmt(char * filename, char * output_directory) {
   strncpy(output_file_name, filename, strlen(filename) - strlen(OUTPUT_SUFFIX));
   output_file_name[ strlen(filename) - strlen(OUTPUT_SUFFIX) ] = '\0';
 
-  char * full_out_file_path = malloc(
-   sizeof(char) * (strlen(output_directory) + strlen(output_file_name) + 2));
-  strcpy(full_out_file_path, output_directory);
-  strcat(full_out_file_path, "/");
-  strcat(full_out_file_path, output_file_name);
+  char * full_out_file_path;
+  if (strcmp(output_file_path, "") != 0) {
+    full_out_file_path = output_file_path;
+  } else {
+    full_out_file_path = output_file_name;
+  }
   FILE * output_file = create_file_binary_write(full_out_file_path);
   PRINT_ERROR_AND_RETURN_IF_NULL(output_file, "Error in creating output file.");
 

@@ -18,7 +18,7 @@
  * on the original format of the file (FASTA, Genebank, etc.)
  */
 // TODO: redo cldoc so that it has all args
-void vcsfmt(char * filename, char * output_directory);
+void vcsfmt(char * filename, char * output_file_path);
 /* Produces unformatted file from vcsfmt file.
  * @filename the file to produce an unformatted version of.
  *
@@ -26,7 +26,7 @@ void vcsfmt(char * filename, char * output_directory);
  * This method simply forwards to the appropriate strategy depending
  * on the original format of the file (FASTA, Genebank, etc.)
  */
-void de_vcsfmt(char * filename, char * output_directory);
+void de_vcsfmt(char * filename, char * output_file_path);
 
 /* cldoc:end-category() */
 

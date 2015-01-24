@@ -15,19 +15,20 @@ const char * argp_program_bug_address = "<danieldmcclanahan@gmail.com>";
 static struct argp_option options[] = {
  {"unzip", 'u', 0, 0, "Recover original file from vcsfmt or vcscmp file", 0},
  {"zip", 'z', 0, 0, "Produce vcsfmt file from original file.", 1},
- {"output", 'o', "DIR", 0, "Location to produce output files.", 2},
- {"input", 'i', "FILE", 0, "Location of input files.", 3},
- {"width", 'w', "INTEGER", 0, "Width of FASTA file, as applicable.", 4},
+ {"compare", 'c', 0, 0, "Produce vcscmp file from vcsfmt files.", 2},
+ {"output", 'o', "DIR", 0, "Location to produce output files.", 3},
+ {"width", 'w', "INTEGER", 0, "Width of FASTA file, as applicable.", 5},
  // TODO: make this option produce more information
- {"verbose", 'v', 0, 0, "Produce verbose output", 4},
+ {"verbose", 'v', 0, 0, "Produce verbose output", 6},
  {0, 0, 0, 0, 0, 0}};
 
 // used to communicate with parse_opt
 typedef struct {
   GSList * files;
   bool is_zip;
-  bool is_unzip;
-  char * output_file_location;
+  bool is_compare;
+  int is_unzip;
+  char * output_file_path;
   unsigned long long width;
   bool is_verbose;
   bool has_no_args;
@@ -36,9 +37,10 @@ typedef struct {
 dwndiff_arguments initialize_dwndiff_arguments(dwndiff_arguments args) {
   args.files = NULL;
   args.is_zip = false;
+  args.is_compare = false;
   args.is_unzip = false;
   args.width = 0;
-  args.output_file_location = NULL;
+  args.output_file_path = NULL;
   args.is_verbose = false;
   args.has_no_args = false;
   return args;
@@ -50,11 +52,13 @@ static error_t parse_opt(int key, char * arg, struct argp_state * state) {
   case 'z':
     args->is_zip = true;
     break;
+  case 'c':
+    args->is_compare = true;
   case 'u':
     args->is_unzip = true;
     break;
   case 'o':
-    args->output_file_location = arg;
+    args->output_file_path = arg;
     break;
   case 'v':
     args->is_verbose = true;
