@@ -224,8 +224,8 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
         }
       }
     }
-    // shuffle bases over
 
+    // shuffle bases over
     for (unsigned long long base_index = 0; base_index < CODON_LENGTH - 1;
          ++base_index) {
       current_codon_frame[ base_index ] = current_codon_frame[ base_index + 1 ];
@@ -236,11 +236,6 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
 
   // if this is the last block, eject the last two bases
   if (is_final_block) {
-#ifdef DEBUG
-    PRINT_ERROR("GETS HERE");
-    fprintf(stderr, "%c,%c,%c\n", current_codon_frame[ 0 ],
-            current_codon_frame[ 1 ], current_codon_frame[ 2 ]);
-#endif
     for (unsigned long long base_index = 0; base_index < CODON_LENGTH - 1;
          ++base_index) {
       if (current_codon_frame[ base_index ] != '\0') {
@@ -283,12 +278,6 @@ string_with_size * de_process_block_vcsfmt(string_with_size * input_block,
 void concurrent_read_and_process_block_vcsfmt(
  concurrent_read_and_process_block_args_vcsfmt * args) {
   while (!feof(args->input_file) && !ferror(args->input_file)) {
-    // TODO: remove this?
-    /*
-    add_to_bytes_processed(
-     args->total_bytes_read,
-     read_block(args->input_file, args->input_block)->readable_bytes);
-    */
     read_block(args->input_file, args->input_block_with_size);
     // OPTIMIZATION: allocate from (possibly self-growing) pool of memory
     args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
@@ -296,11 +285,6 @@ void concurrent_read_and_process_block_vcsfmt(
                          args->output_block_with_size, args->is_within_orf,
                          args->cur_orf_pos, args->current_codon_frame,
                          feof(args->input_file));
-#ifdef DEBUG
-    fprintf(stderr, "%c\n",
-            args->output_block_with_size
-             ->string[ args->output_block_with_size->readable_bytes - 1 ]);
-#endif
     if (feof(args->input_file)) { // if last loop
       g_mutex_lock(args->process_complete_mutex);
     }
@@ -317,13 +301,6 @@ void concurrent_write_block_vcsfmt(
   while (!res) {
     args->active_block_with_size =
      (string_with_size *) g_async_queue_pop(args->active_queue);
-    // TODO: remove this?
-    /*
-    add_to_bytes_processed(
-     args->total_bytes_written,
-     write_block(args->active_file,
-    args->active_block_with_size)->readable_bytes);
-    */
     write_block(args->active_file, args->active_block_with_size);
     free_string_with_size(args->active_block_with_size);
     res = is_processing_complete_vcsfmt_concurrent(args);
@@ -335,13 +312,6 @@ void concurrent_write_block_vcsfmt(
        --queue_size) {
     args->active_block_with_size =
      (string_with_size *) g_async_queue_pop(args->active_queue);
-    // TODO: remove this?
-    /*
-    add_to_bytes_processed(
-     args->total_bytes_written,
-     write_block(args->active_file,
-    args->active_block_with_size)->readable_bytes);
-    */
     write_block(args->active_file, args->active_block_with_size);
     free_string_with_size(args->active_block_with_size);
   }
