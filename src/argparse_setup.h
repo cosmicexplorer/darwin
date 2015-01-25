@@ -54,6 +54,7 @@ static error_t parse_opt(int key, char * arg, struct argp_state * state) {
     break;
   case 'c':
     args->is_compare = true;
+    break;
   case 'u':
     args->is_unzip = true;
     break;

@@ -84,8 +84,7 @@ string_with_size * get_current_line_of_file(FILE * source_file);
 string_with_size *
  process_block_vcsfmt(string_with_size * input_block_with_size,
                       string_with_size * output_block_with_size,
-                      bool * is_within_orf, bool * is_within_comment,
-                      unsigned long long * cur_orf_pos,
+                      bool * is_within_orf, unsigned long long * cur_orf_pos,
                       char * current_codon_frame, bool is_final_block);
 
 // left non-const so it can be modified at runtime with argv
@@ -93,7 +92,7 @@ extern unsigned long long FASTA_LINE_LENGTH;
 string_with_size *
  de_process_block_vcsfmt(string_with_size * input_block_with_size,
                          string_with_size * output_block_with_size,
-                         bool * is_in_comment, int * cur_posn_in_line);
+                         int * cur_posn_in_line);
 
 #ifdef CONCURRENT
 // send arguments to queue
@@ -109,7 +108,8 @@ typedef struct {
   char * current_codon_frame;
   bool is_final_block;
   GAsyncQueue * active_queue;
-  result_bytes_processed * total_bytes_read;
+  // TODO: remove this?
+  // result_bytes_processed * total_bytes_read;
   volatile bool * is_processing_complete;
   GMutex * process_complete_mutex;
 } concurrent_read_and_process_block_args_vcsfmt;
@@ -120,7 +120,8 @@ typedef struct {
   FILE * active_file;
   string_with_size * active_block_with_size;
   GAsyncQueue * active_queue;
-  result_bytes_processed * total_bytes_written;
+  // TODO: remove this?
+  // result_bytes_processed * total_bytes_written;
   volatile bool * is_processing_complete;
   GMutex * process_complete_mutex;
 } concurrent_read_write_block_args_vcsfmt;
@@ -130,8 +131,8 @@ void concurrent_read_and_process_block_vcsfmt(
  concurrent_read_and_process_block_args_vcsfmt * args);
 
 // TODO: javadoc
-void
- concurrent_write_block_vcsfmt(concurrent_read_write_block_args_vcsfmt * args);
+void concurrent_write_block_vcsfmt(
+ concurrent_read_write_block_args_vcsfmt * args);
 
 // TODO: javadoc
 // cool mutex stuff

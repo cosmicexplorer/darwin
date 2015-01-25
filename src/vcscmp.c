@@ -429,7 +429,14 @@ void vcscmp(const char * prev_filename, const char * cur_filename,
   PRINT_ERROR_AND_RETURN_IF_NULL(cur_file_used_for_edits,
                                  "Error in reading cur file.");
 #ifdef CONCURRENT
-#error FUNCTIONALITY NOT IMPLEMENTED YET
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic warning "-W#warnings"
+#warning FUNCTIONALITY NOT IMPLEMENTED YET
+#pragma GCC diagnostic pop
+#else
+#error NON-GCC/CLANG COMPILERS NOT YET SUPPORTED
+#endif
 #else
   // OPTIMIZATION:
   // implement fixed-size array-based queue for speed

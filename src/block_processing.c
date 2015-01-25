@@ -155,40 +155,29 @@ string_with_size * get_current_line_of_file(FILE * source_file) {
 string_with_size * process_block_vcsfmt(string_with_size * input_block,
                                         string_with_size * output_block,
                                         bool * is_within_orf,
-                                        bool * is_within_comment,
                                         unsigned long long * cur_orf_pos,
                                         char * current_codon_frame,
                                         bool is_final_block) {
   output_block->readable_bytes = 0;
   for (unsigned long long codon_index = 0;
        codon_index < input_block->readable_bytes; ++codon_index) {
+    while (NEWLINE == input_block->string[ codon_index ] &&
+           codon_index < input_block->readable_bytes) {
+      ++codon_index;
+    }
+    // MUST be true iff newline is the last character in input_block
+    if (codon_index >= input_block->readable_bytes) { // > not required
+      break;
+    } else {
+      current_codon_frame[ CODON_LENGTH - 1 ] =
+       input_block->string[ codon_index ];
+    }
     // first base is only null at start/end of ORF or at beginning
     if ('\0' != current_codon_frame[ 0 ]) {
-      if (current_codon_frame[ 0 ] != 'A' && current_codon_frame[ 0 ] != 'G' &&
-          current_codon_frame[ 0 ] != 'C' && current_codon_frame[ 0 ] != 'T' &&
-          current_codon_frame[ 0 ] != '\n') {
-        fprintf(stderr, "%c\n", current_codon_frame[ 0 ]);
-      }
-      if (*is_within_comment) {
-        // terminate comments at end of line
-        if (NEWLINE == current_codon_frame[ 0 ]) {
-          *is_within_comment = false;
-        }
-        output_block->string[ output_block->readable_bytes ] =
-         current_codon_frame[ 0 ];
-        ++output_block->readable_bytes;
-      } else if ('>' == current_codon_frame[ 0 ]) {
-        PRINT_ERROR("yo lol");
-        *is_within_comment = true;
-        output_block->string[ output_block->readable_bytes ] = NEWLINE;
-        ++output_block->readable_bytes;
-        output_block->string[ output_block->readable_bytes ] = NEWLINE;
-        ++output_block->readable_bytes;
-        output_block->string[ output_block->readable_bytes ] =
-         current_codon_frame[ 0 ];
-        ++output_block->readable_bytes;
-      } else if (NEWLINE == current_codon_frame[ 0 ]) {
-        // do nothing
+      if (NEWLINE == current_codon_frame[ 0 ]) {
+#ifdef DEBUG
+        PRINT_ERROR("SHOULD NEVER BE HERE; NEWLINES SHOULD BE GONE");
+#endif
       } else if (*is_within_orf) {
         if (*cur_orf_pos >= MIN_ORF_LENGTH - CODON_LENGTH &&
             is_stop_codon(current_codon_frame)) {
@@ -241,77 +230,50 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
          ++base_index) {
       current_codon_frame[ base_index ] = current_codon_frame[ base_index + 1 ];
     }
-    current_codon_frame[ CODON_LENGTH - 1 ] = '\0'; // nullify final
-    while (codon_index + 1 < input_block->readable_bytes) {
-      if (NEWLINE != input_block->string[ codon_index + 1 ]) {
-        current_codon_frame[ CODON_LENGTH - 1 ] =
-         input_block->string[ codon_index + 1 ];
-        break;
-      } else {
-        ++codon_index;
-      }
-    }
+    current_codon_frame[ CODON_LENGTH - 1 ] = '\0';
     // leaves first two codons in current_codon_frame pointer for next block
   }
 
   // if this is the last block, eject the last two bases
   if (is_final_block) {
+#ifdef DEBUG
+    PRINT_ERROR("GETS HERE");
+    fprintf(stderr, "%c,%c,%c\n", current_codon_frame[ 0 ],
+            current_codon_frame[ 1 ], current_codon_frame[ 2 ]);
+#endif
     for (unsigned long long base_index = 0; base_index < CODON_LENGTH - 1;
          ++base_index) {
-      if (output_block->string[ output_block->readable_bytes + base_index ] !=
-          '\0') {
-        output_block->string[ output_block->readable_bytes + base_index ] =
+      if (current_codon_frame[ base_index ] != '\0') {
+        output_block->string[ output_block->readable_bytes ] =
          current_codon_frame[ base_index ];
+        ++output_block->readable_bytes;
       }
     }
-    output_block->readable_bytes += CODON_LENGTH - 1;
   }
   return output_block;
 }
 
-unsigned long long FASTA_LINE_LENGTH = 70;
 string_with_size * de_process_block_vcsfmt(string_with_size * input_block,
                                            string_with_size * output_block,
-                                           bool * is_in_comment,
                                            int * cur_posn_in_line) {
   output_block->readable_bytes = 0;
   for (unsigned long long bytes_read = 0;
        bytes_read < input_block->readable_bytes; ++bytes_read) {
-    if (!*is_in_comment) {
-      if ('>' == input_block->string[ bytes_read ]) {
-        *is_in_comment = true;
-        output_block->string[ output_block->readable_bytes ] = NEWLINE;
-        ++output_block->readable_bytes;
-        output_block->string[ output_block->readable_bytes ] =
-         input_block->string[ bytes_read ];
-        ++output_block->readable_bytes;
-        *cur_posn_in_line = 0;
-      } else if (*cur_posn_in_line > ((int) FASTA_LINE_LENGTH) - 2 &&
-                 // IFFY: this cast scares me
-                 NEWLINE != input_block->string[ bytes_read ]) {
-        output_block->string[ output_block->readable_bytes ] = NEWLINE;
-        ++output_block->readable_bytes;
-        output_block->string[ output_block->readable_bytes ] =
-         input_block->string[ bytes_read ];
-        ++output_block->readable_bytes;
-        *cur_posn_in_line = 0;
-      } else if (NEWLINE != input_block->string[ bytes_read ]) {
-        // if <= FASTA_LINE_LENGTH
-        output_block->string[ output_block->readable_bytes ] =
-         input_block->string[ bytes_read ];
-        ++output_block->readable_bytes;
-        ++*cur_posn_in_line;
-      }
-    } else { // in comment
-      if (NEWLINE == input_block->string[ bytes_read ]) {
-        *is_in_comment = false;
-        *cur_posn_in_line = -1;
-      } else {
-        ++*cur_posn_in_line;
-      }
+    if (*cur_posn_in_line >= ((int) FASTA_LINE_LENGTH) &&
+        // IFFY: this cast scares me
+        NEWLINE != input_block->string[ bytes_read ]) {
+      output_block->string[ output_block->readable_bytes ] = NEWLINE;
+      ++output_block->readable_bytes;
       output_block->string[ output_block->readable_bytes ] =
        input_block->string[ bytes_read ];
       ++output_block->readable_bytes;
+      *cur_posn_in_line = 1;
+    } else if (NEWLINE != input_block->string[ bytes_read ]) {
+      // if <= FASTA_LINE_LENGTH
+      output_block->string[ output_block->readable_bytes ] =
+       input_block->string[ bytes_read ];
+      ++output_block->readable_bytes;
+      ++*cur_posn_in_line;
     }
   }
   return output_block;
@@ -321,18 +283,28 @@ string_with_size * de_process_block_vcsfmt(string_with_size * input_block,
 void concurrent_read_and_process_block_vcsfmt(
  concurrent_read_and_process_block_args_vcsfmt * args) {
   while (!feof(args->input_file) && !ferror(args->input_file)) {
+    // TODO: remove this?
+    /*
     add_to_bytes_processed(
      args->total_bytes_read,
      read_block(args->input_file, args->input_block)->readable_bytes);
+    */
+    read_block(args->input_file, args->input_block_with_size);
     // OPTIMIZATION: allocate from (possibly self-growing) pool of memory
-    args->output_block = make_new_string_with_size(BIN_BLOCK_SIZE);
-    process_block_vcsfmt(args->input_block, args->output_block,
-                         args->is_within_orf, args->cur_orf_pos,
-                         args->current_codon_frame, feof(args->input_file));
+    args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
+    process_block_vcsfmt(args->input_block_with_size,
+                         args->output_block_with_size, args->is_within_orf,
+                         args->cur_orf_pos, args->current_codon_frame,
+                         feof(args->input_file));
+#ifdef DEBUG
+    fprintf(stderr, "%c\n",
+            args->output_block_with_size
+             ->string[ args->output_block_with_size->readable_bytes - 1 ]);
+#endif
     if (feof(args->input_file)) { // if last loop
       g_mutex_lock(args->process_complete_mutex);
     }
-    g_async_queue_push(args->active_queue, args->output_block);
+    g_async_queue_push(args->active_queue, args->output_block_with_size);
   }
   *args->is_processing_complete = true;
   g_mutex_unlock(args->process_complete_mutex);
@@ -340,24 +312,38 @@ void concurrent_read_and_process_block_vcsfmt(
 
 void concurrent_write_block_vcsfmt(
  concurrent_read_write_block_args_vcsfmt * args) {
-  while (!is_processing_complete_vcsfmt_concurrent(args)) {
-    g_mutex_unlock(args->process_complete_mutex);
-    args->active_block =
+  bool res;
+  res = is_processing_complete_vcsfmt_concurrent(args);
+  while (!res) {
+    args->active_block_with_size =
      (string_with_size *) g_async_queue_pop(args->active_queue);
+    // TODO: remove this?
+    /*
     add_to_bytes_processed(
      args->total_bytes_written,
-     write_block(args->active_file, args->active_block)->readable_bytes);
-    free_string_with_size(args->active_block);
+     write_block(args->active_file,
+    args->active_block_with_size)->readable_bytes);
+    */
+    write_block(args->active_file, args->active_block_with_size);
+    free_string_with_size(args->active_block_with_size);
+    res = is_processing_complete_vcsfmt_concurrent(args);
   }
   // get the rest left over (if any)
-  for (unsigned long long queue_size = g_async_queue_length(args->active_queue);
-       queue_size != 0; --queue_size) {
-    args->active_block =
+  unsigned long long queue_len;
+  queue_len = g_async_queue_length(args->active_queue);
+  for (unsigned long long queue_size = queue_len; queue_size != 0;
+       --queue_size) {
+    args->active_block_with_size =
      (string_with_size *) g_async_queue_pop(args->active_queue);
+    // TODO: remove this?
+    /*
     add_to_bytes_processed(
      args->total_bytes_written,
-     write_block(args->active_file, args->active_block)->readable_bytes);
-    free_string_with_size(args->active_block);
+     write_block(args->active_file,
+    args->active_block_with_size)->readable_bytes);
+    */
+    write_block(args->active_file, args->active_block_with_size);
+    free_string_with_size(args->active_block_with_size);
   }
 }
 
