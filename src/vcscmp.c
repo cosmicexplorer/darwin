@@ -111,7 +111,6 @@ void if_close_levenshtein_dist_add_to_list(
   if (prev_line_id->is_orf && cur_data->id->is_orf &&
       !cur_data->is_leven_found) { // don't do it if close match already found
 // use && instead of == so short non-orfs don't match
-// TODO: instead of absolute levenshtein distance, use proportional
 #ifdef DEBUG
     PRINT_ERROR_NO_NEWLINE("prev_line (");
     PRINT_ERROR_MPZ_T_NO_NEWLINE(prev_line_id->line_number);
@@ -129,6 +128,7 @@ void if_close_levenshtein_dist_add_to_list(
 #endif
     unsigned long long leven_dist = get_levenshtein_distance(
      prev_line_id->first_k_chars, cur_data->id->first_k_chars);
+    // TODO: instead of absolute levenshtein distance, use proportional
     if (leven_dist < LEVENSHTEIN_CHECK_THRESHOLD) {
 #ifdef DEBUG
       PRINT_ERROR("CLOSE STRING FOUND BY LEVENSHTEIN EDITS");

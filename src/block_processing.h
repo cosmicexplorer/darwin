@@ -102,42 +102,52 @@ string_with_size *
 typedef struct {
   FILE * input_file;
   string_with_size * input_block_with_size;
-  string_with_size * output_block_with_size;
+  GAsyncQueue * read_queue;
+  volatile bool * is_reading_complete;
+  GMutex * read_complete_mutex;
+} concurrent_read_block_args_vcsfmt;
+typedef struct {
   bool * is_within_orf;
   unsigned long long * cur_orf_pos;
   char * current_codon_frame;
-  bool is_final_block;
-  GAsyncQueue * active_queue;
-  // TODO: remove this?
-  // result_bytes_processed * total_bytes_read;
+  string_with_size * input_block_with_size;
+  string_with_size * output_block_with_size;
+  GAsyncQueue * read_queue;
+  GAsyncQueue * write_queue;
+  volatile bool * is_reading_complete;
   volatile bool * is_processing_complete;
+  GMutex * read_complete_mutex;
   GMutex * process_complete_mutex;
-} concurrent_read_and_process_block_args_vcsfmt;
+} concurrent_process_block_args_vcsfmt;
 // used as variadic arguments to function
 // concurrent_read_and_process_block_vcsfmt for GThread
 // TODO: obv javadoc
 typedef struct {
-  FILE * active_file;
-  string_with_size * active_block_with_size;
-  GAsyncQueue * active_queue;
-  // TODO: remove this?
-  // result_bytes_processed * total_bytes_written;
+  FILE * output_file;
+  string_with_size * output_block_with_size;
+  GAsyncQueue * write_queue;
   volatile bool * is_processing_complete;
   GMutex * process_complete_mutex;
-} concurrent_read_write_block_args_vcsfmt;
+} concurrent_write_block_args_vcsfmt;
 
 // TODO: javadoc
-void concurrent_read_and_process_block_vcsfmt(
- concurrent_read_and_process_block_args_vcsfmt * args);
+void concurrent_read_block_vcsfmt(concurrent_read_block_args_vcsfmt * args);
 
 // TODO: javadoc
-void concurrent_write_block_vcsfmt(
- concurrent_read_write_block_args_vcsfmt * args);
+void concurrent_process_block_vcsfmt(
+ concurrent_process_block_args_vcsfmt * args);
+
+// TODO: javadoc
+bool is_last_read_block_vcsfmt_concurrent(
+ concurrent_process_block_args_vcsfmt * args);
+
+// TODO: javadoc
+void concurrent_write_block_vcsfmt(concurrent_write_block_args_vcsfmt * args);
 
 // TODO: javadoc
 // cool mutex stuff
 bool is_processing_complete_vcsfmt_concurrent(
- concurrent_read_write_block_args_vcsfmt * args);
+ concurrent_write_block_args_vcsfmt * args);
 
 #endif
 #endif /*___BLOCK_PROCESSING_H___*/

@@ -1,25 +1,15 @@
-#include <argp.h> // for argparse
-
 #include "argparse_setup.h" // for argparse processing
 #include "vcsfmt.h"         // for file processing and I/O
 
 #ifndef CONCURRENT
-#include "vcscmp.h"         // for producing diff-compatible output
+#include "vcscmp.h" // for producing diff-compatible output
 #endif
 
-dwndiff_arguments args;
+struct dwndiff_arguments args;
 
 unsigned long long FASTA_LINE_LENGTH = 70; // default value
 
-void format_file_arg(char * filename) {
-  if (args.is_zip) {
-    vcsfmt(filename, args.output_file_path);
-  } else if (args.is_unzip) {
-    de_vcsfmt(filename, args.output_file_path);
-  } else {
-    PRINT_ERROR_AND_RETURN("Error: Neither zip nor unzip specified for file.");
-  }
-}
+void format_file_arg(char * filename);
 
 int main(int argc, char ** argv) {
 
@@ -48,7 +38,7 @@ int main(int argc, char ** argv) {
 #ifdef CONCURRENT
         PRINT_ERROR("Cannot vcscmp in concurrent mode yet.");
         return -1;
-        #else
+#else
         if (g_slist_length(args.files) != 2) {
           PRINT_ERROR("Error: comparison only works on two vcsfmt files.");
           return -1;
@@ -56,11 +46,21 @@ int main(int argc, char ** argv) {
           vcscmp(g_slist_nth_data(args.files, 0),
                  g_slist_nth_data(args.files, 1), args.output_file_path);
         }
-        #endif
+#endif
       }
     } else {
       PRINT_ERROR("Error: No input files given.");
       return -1;
     }
+  }
+}
+
+void format_file_arg(char * filename) {
+  if (args.is_zip) {
+    vcsfmt(filename, args.output_file_path);
+  } else if (args.is_unzip) {
+    de_vcsfmt(filename, args.output_file_path);
+  } else {
+    PRINT_ERROR_AND_RETURN("Error: Neither zip nor unzip specified for file.");
   }
 }

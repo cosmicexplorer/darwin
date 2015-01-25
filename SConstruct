@@ -13,8 +13,10 @@ env.output_executable = env.Program(env.executable_name,Glob(env.binary_dir +
 # defines
 env.dna_modes = ['ECOLI','SINGLE_START_CODON']
 env.Append(CPPDEFINES = env.dna_modes)
-env.process_modes = ['CONCURRENT']
-env.Append(CPPDEFINES = env.process_modes)
+concurrent = ARGUMENTS.get('concurrent',0)
+if (int(concurrent)):
+    env.process_modes = ['CONCURRENT']
+    env.Append(CPPDEFINES = env.process_modes)
 
 # debug/release
 debug = ARGUMENTS.get('debug',0) # defaults to debug configuration

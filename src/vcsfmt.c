@@ -26,55 +26,86 @@ void vcsfmt(char * filename, char * output_file_path) {
 
   string_with_size * input_block_with_size =
    make_new_string_with_size(BLOCK_SIZE);
+
 #ifndef CONCURRENT
   string_with_size * output_block_with_size =
    make_new_string_with_size(BIN_BLOCK_SIZE);
-
 #endif
-  bool is_within_orf = false; // file begins outside of orf
-  unsigned long long cur_orf_pos = 0;
+
+  bool * is_within_orf = malloc(sizeof(bool));
+  *is_within_orf = false; // file begins outside of orf
+  unsigned long long * cur_orf_pos = malloc(sizeof(unsigned long long));
+  *cur_orf_pos = 0;
   char * current_codon_frame = malloc(sizeof(char) * CODON_LENGTH);
   for (size_t base_index = 0; base_index < CODON_LENGTH; ++base_index) {
     current_codon_frame[ base_index ] = '\0';
   }
 
 #ifdef CONCURRENT
-  GAsyncQueue * active_queue = g_async_queue_new();
-  bool * is_processing_complete = malloc(sizeof(bool));
+  GAsyncQueue * read_queue = g_async_queue_new();
+  GAsyncQueue * write_queue = g_async_queue_new();
+  volatile bool * is_reading_complete = malloc(sizeof(bool));
+  *is_reading_complete = false;
+  volatile bool * is_processing_complete = malloc(sizeof(bool));
   *is_processing_complete = false;
+  GMutex * read_complete_mutex = malloc(sizeof(GMutex));
+  g_mutex_init(read_complete_mutex);
   GMutex * process_complete_mutex = malloc(sizeof(GMutex));
   g_mutex_init(process_complete_mutex);
 
-  concurrent_read_and_process_block_args_vcsfmt args_to_block_processing;
-  args_to_block_processing.input_file = input_file;
-  args_to_block_processing.input_block_with_size = input_block_with_size;
-  args_to_block_processing.is_within_orf = &is_within_orf;
-  args_to_block_processing.cur_orf_pos = &cur_orf_pos;
-  args_to_block_processing.current_codon_frame = current_codon_frame;
-  args_to_block_processing.is_final_block = false;
-  args_to_block_processing.active_queue = active_queue;
-  // TODO: remove this?
-  // args_to_block_processing.total_bytes_read = total_bytes_read;
-  args_to_block_processing.is_processing_complete = is_processing_complete;
-  args_to_block_processing.process_complete_mutex = process_complete_mutex;
+  concurrent_read_block_args_vcsfmt * args_to_read_block =
+   malloc(sizeof(concurrent_read_block_args_vcsfmt));
+  args_to_read_block->input_file = input_file;
+  args_to_read_block->input_block_with_size = NULL;
+  args_to_read_block->read_queue = read_queue;
+  args_to_read_block->is_reading_complete = is_reading_complete;
+  args_to_read_block->read_complete_mutex = read_complete_mutex;
 
-  concurrent_read_write_block_args_vcsfmt args_to_write_block;
-  args_to_write_block.active_file = output_file;
-  args_to_write_block.active_queue = active_queue;
-  // TODO: remove this?
-  // args_to_write_block.total_bytes_written = total_bytes_written;
-  args_to_write_block.is_processing_complete = is_processing_complete;
-  args_to_write_block.process_complete_mutex = process_complete_mutex;
+  concurrent_process_block_args_vcsfmt * args_to_block_processing =
+   malloc(sizeof(concurrent_process_block_args_vcsfmt));
+  args_to_block_processing->is_within_orf = is_within_orf;
+  args_to_block_processing->cur_orf_pos = cur_orf_pos;
+  args_to_block_processing->current_codon_frame = current_codon_frame;
+  args_to_block_processing->input_block_with_size = NULL;
+  args_to_block_processing->output_block_with_size = NULL;
+  args_to_block_processing->read_queue = read_queue;
+  args_to_block_processing->write_queue = write_queue;
+  args_to_block_processing->is_reading_complete = is_reading_complete;
+  args_to_block_processing->is_processing_complete = is_processing_complete;
+  args_to_block_processing->is_processing_complete = is_processing_complete;
+  args_to_block_processing->read_complete_mutex = read_complete_mutex;
+  args_to_block_processing->process_complete_mutex = process_complete_mutex;
 
-  GThread * read_and_process_block_thread =
-   g_thread_new("read_and_process_block_thread",
-                (GThreadFunc) concurrent_read_and_process_block_vcsfmt,
-                &args_to_block_processing);
+  concurrent_write_block_args_vcsfmt * args_to_write_block =
+   malloc(sizeof(concurrent_write_block_args_vcsfmt));
+  args_to_write_block->output_file = output_file;
+  args_to_write_block->output_block_with_size = NULL;
+  args_to_write_block->write_queue = write_queue;
+  args_to_write_block->is_processing_complete = is_processing_complete;
+  args_to_write_block->process_complete_mutex = process_complete_mutex;
+
+  GThread * read_block_thread =
+   g_thread_new("read_block_thread", (GThreadFunc) concurrent_read_block_vcsfmt,
+                args_to_read_block);
+
+  GThread * process_block_thread = g_thread_new(
+   "process_block_thread", (GThreadFunc) concurrent_process_block_vcsfmt,
+   args_to_block_processing);
+
   GThread * write_block_thread = g_thread_new(
    "write_block_thread", (GThreadFunc) concurrent_write_block_vcsfmt,
-   &args_to_write_block);
-  g_thread_join(read_and_process_block_thread); // TODO: is this required?
-  g_thread_join(write_block_thread);            // implicitly frees thread
+   args_to_write_block);
+
+  PRINT_ERROR("GETS HERE1");
+
+  // we know the threads will line up this way
+  // because of the queue pipelines
+  g_thread_join(read_block_thread);
+  PRINT_ERROR("GETS HERE2");
+  g_thread_join(process_block_thread);
+  PRINT_ERROR("GETS HERE3");
+  g_thread_join(write_block_thread);
+  PRINT_ERROR("GETS HERE4");
 
 #else
 
@@ -85,8 +116,8 @@ void vcsfmt(char * filename, char * output_file_path) {
     // Process the block and write it to output.
     write_block(output_file,
                 process_block_vcsfmt(
-                 input_block_with_size, output_block_with_size, &is_within_orf,
-                 &cur_orf_pos, current_codon_frame, feof(input_file)));
+                 input_block_with_size, output_block_with_size, is_within_orf,
+                 cur_orf_pos, current_codon_frame, feof(input_file)));
   }
 
   // error handling
@@ -104,10 +135,11 @@ void vcsfmt(char * filename, char * output_file_path) {
 // cleanup allocated memory and open handles
 #ifdef CONCURRENT
   // TODO: fix mutex and thread memory leaks (if they actually exist???)
-  g_async_queue_unref(active_queue);
-  free(is_processing_complete);
+  g_async_queue_unref(read_queue);
+  g_async_queue_unref(write_queue);
+  // TODO: don't leak mem
+  g_mutex_clear(read_complete_mutex);
   g_mutex_clear(process_complete_mutex);
-  g_thread_unref(read_and_process_block_thread); // write thread freed by join
 #endif
   free(output_file_name);
   free_string_with_size(input_block_with_size);
