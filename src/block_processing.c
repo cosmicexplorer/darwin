@@ -381,11 +381,50 @@ bool is_processing_complete_vcsfmt_concurrent(
   if (g_async_queue_length(args->write_queue) > 0) {
     return false;
   } else {
-    // OPTIMIZATION: make this variable static somehow
     bool result;
     g_mutex_lock(args->process_complete_mutex);
     result = *args->is_processing_complete;
     g_mutex_unlock(args->process_complete_mutex);
+    return result;
+  }
+}
+
+// TODO: put this and concurrent_process_block_vcsfmt into one function so that
+// code isn't duplicated
+void concurrent_process_block_de_vcsfmt(
+ concurrent_process_block_args_de_vcsfmt * args) {
+  while (!is_reading_complete_de_vcsfmt_concurrent(args)) {
+    args->input_block_with_size = g_async_queue_pop(args->read_queue);
+#ifdef MEMPOOL
+    args->output_block_with_size =
+     make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX_VCSFMT);
+#else
+    args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
+#endif
+    de_process_block_vcsfmt(args->input_block_with_size,
+                            args->output_block_with_size,
+                            args->cur_posn_in_line);
+    g_async_queue_push(args->write_queue, args->output_block_with_size);
+#ifdef MEMPOOL
+    free_string_with_size_to_pool(args->input_block_with_size);
+#else
+    free_string_with_size(args->input_block_with_size); // let's not leak memory
+#endif
+  }
+  g_mutex_lock(args->process_complete_mutex);
+  *args->is_processing_complete = true;
+  g_mutex_unlock(args->process_complete_mutex);
+}
+
+bool is_reading_complete_de_vcsfmt_concurrent(
+ concurrent_process_block_args_de_vcsfmt * args) {
+  if (g_async_queue_length(args->read_queue) > 0) {
+    return false;
+  } else {
+    bool result;
+    g_mutex_lock(args->read_complete_mutex);
+    result = *args->is_reading_complete;
+    g_mutex_unlock(args->read_complete_mutex);
     return result;
   }
 }

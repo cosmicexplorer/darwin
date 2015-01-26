@@ -149,5 +149,24 @@ void concurrent_write_block_vcsfmt(concurrent_write_block_args_vcsfmt * args);
 bool is_processing_complete_vcsfmt_concurrent(
  concurrent_write_block_args_vcsfmt * args);
 
+typedef struct {
+  unsigned long long * cur_posn_in_line;
+  string_with_size * input_block_with_size;
+  string_with_size * output_block_with_size;
+  GAsyncQueue * read_queue;
+  GAsyncQueue * write_queue;
+  volatile bool * is_reading_complete;
+  volatile bool * is_processing_complete;
+  GMutex * read_complete_mutex;
+  GMutex * process_complete_mutex;
+} concurrent_process_block_args_de_vcsfmt;
+
+// TODO: javadoc
+void concurrent_process_block_de_vcsfmt(
+ concurrent_process_block_args_de_vcsfmt * args);
+
+bool is_reading_complete_de_vcsfmt_concurrent(
+ concurrent_process_block_args_de_vcsfmt * args);
+
 #endif
 #endif /*___BLOCK_PROCESSING_H___*/
