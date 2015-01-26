@@ -162,12 +162,13 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
   for (unsigned long long codon_index = 0;
        codon_index < input_block->readable_bytes; ++codon_index) {
     // TODO: figure out why valgrind is saying there's an uninitialized value
+    // cause this actually makes no sense whatsoever
     while (NEWLINE == input_block->string[ codon_index ] &&
            codon_index < input_block->readable_bytes) {
       ++codon_index;
     }
     // MUST be true iff newline is the last character in input_block
-    if (codon_index >= input_block->readable_bytes) { // > not required
+    if (codon_index >= input_block->readable_bytes) {
       break;
     } else {
       current_codon_frame[ CODON_LENGTH - 1 ] =
@@ -249,13 +250,14 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
   return output_block;
 }
 
-string_with_size * de_process_block_vcsfmt(string_with_size * input_block,
-                                           string_with_size * output_block,
-                                           int * cur_posn_in_line) {
+string_with_size *
+ de_process_block_vcsfmt(string_with_size * input_block,
+                         string_with_size * output_block,
+                         unsigned long long * cur_posn_in_line) {
   output_block->readable_bytes = 0;
   for (unsigned long long bytes_read = 0;
        bytes_read < input_block->readable_bytes; ++bytes_read) {
-    if (*cur_posn_in_line >= ((int) FASTA_LINE_LENGTH) &&
+    if (*cur_posn_in_line >= FASTA_LINE_LENGTH &&
         // IFFY: this cast scares me
         NEWLINE != input_block->string[ bytes_read ]) {
       output_block->string[ output_block->readable_bytes ] = NEWLINE;
@@ -280,13 +282,16 @@ void concurrent_read_block_vcsfmt(concurrent_read_block_args_vcsfmt * args) {
   while (!feof(args->input_file) && !ferror(args->input_file)) {
 #ifdef MEMPOOL
     args->input_block_with_size =
-     make_new_string_with_size_from_pool(INPUT_BLOCK_MEMPOOL_INDEX);
+     make_new_string_with_size_from_pool(INPUT_BLOCK_MEMPOOL_INDEX_VCSFMT);
 #else
     args->input_block_with_size = make_new_string_with_size(BLOCK_SIZE);
 #endif
     read_block(args->input_file, args->input_block_with_size);
     if (feof(args->input_file)) {
       g_mutex_lock(args->read_complete_mutex);
+      // TODO: figure out GAsyncQueue is reporting a size of -1 here sometimes!
+      fprintf(stderr, "in queue size: %d\n",
+              g_async_queue_length(args->read_queue));
     }
     g_async_queue_push(args->read_queue, args->input_block_with_size);
   }
@@ -300,7 +305,7 @@ void concurrent_process_block_vcsfmt(
     args->input_block_with_size = g_async_queue_pop(args->read_queue);
 #ifdef MEMPOOL
     args->output_block_with_size =
-     make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX);
+     make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX_VCSFMT);
 #else
     args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
 #endif
@@ -314,10 +319,13 @@ void concurrent_process_block_vcsfmt(
     free_string_with_size(args->input_block_with_size); // let's not leak memory
 #endif
   }
+  if (g_async_queue_length(args->read_queue) != 1) {
+    PRINT_ERROR("THIS SHOULD NEVER HAPPEN");
+  }
   args->input_block_with_size = g_async_queue_pop(args->read_queue);
 #ifdef MEMPOOL
   args->output_block_with_size =
-   make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX);
+   make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX_VCSFMT);
 #else
   args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
 #endif
@@ -337,6 +345,9 @@ void concurrent_process_block_vcsfmt(
 
 bool is_last_read_block_vcsfmt_concurrent(
  concurrent_process_block_args_vcsfmt * args) {
+  if (g_async_queue_length(args->read_queue) == 0) {
+    PRINT_ERROR("THIS IS WHAT CAUSED THE THING THAT SHOULD NEVER HAPPEN");
+  }
   if (g_async_queue_length(args->read_queue) > 1) {
     return false;
   } else {

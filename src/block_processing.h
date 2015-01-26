@@ -92,7 +92,7 @@ extern unsigned long long FASTA_LINE_LENGTH;
 string_with_size *
  de_process_block_vcsfmt(string_with_size * input_block_with_size,
                          string_with_size * output_block_with_size,
-                         int * cur_posn_in_line);
+                         unsigned long long * cur_posn_in_line);
 
 #ifdef CONCURRENT
 // send arguments to queue

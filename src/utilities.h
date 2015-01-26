@@ -32,9 +32,9 @@
 
 // DEBUGGING MACROS
 
-#define PRINT_ERROR_NO_NEWLINE(str) fprintf(stderr, "%s", (str))
-
 #define PRINT_ERROR(str) fprintf(stderr, "%s\n", (str))
+
+#define PRINT_ERROR_NO_NEWLINE(str) fprintf(stderr, "%s", (str))
 
 #define PRINT_ERROR_NEWLINE() fprintf(stderr, "\n")
 
@@ -103,8 +103,11 @@ typedef struct {
 
 #define STARTING_NUM_SWS_IN_POOL 20 // this can be tuned
 
-#define INPUT_BLOCK_MEMPOOL_INDEX 0
-#define OUTPUT_BLOCK_MEMPOOL_INDEX 1
+#define INPUT_BLOCK_MEMPOOL_INDEX_VCSFMT 0
+#define OUTPUT_BLOCK_MEMPOOL_INDEX_VCSFMT 1
+
+#define INPUT_BLOCK_MEMPOOL_INDEX_DE_VCSFMT 0
+#define OUTPUT_BLOCK_MEMPOOL_INDEX_DE_VCSFMT 1
 
 typedef struct {
   /* pointer to character string, NOT null-terminated! */

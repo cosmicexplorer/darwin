@@ -8,7 +8,8 @@
 
 /* cldoc:begin-category(vcsfmt) */
 
-#define OUTPUT_SUFFIX ".vcsfmt"
+#define OUTPUT_SUFFIX_VCSFMT ".vcsfmt"
+#define OUTPUT_SUFFIX_DE_VCSFMT ".de_vcsfmt"
 
 /* Produces formatted file with extension ".vcsfmt".
  * @filename the file to produce a vcsfmt file from.

@@ -4,16 +4,13 @@
 // VCSFMT
 void vcsfmt(char * filename, char * output_file_path) {
   FILE * input_file = open_file_read(filename);
-  if (NULL == input_file) {
-    printf("Error in creating input file.\n");
-    return;
-  }
+  PRINT_ERROR_AND_RETURN_IF_NULL(input_file, "Error in creating input file.");
 
   // create output filename
   char * output_file_name =
-   malloc((strlen(filename) + strlen(OUTPUT_SUFFIX) + 1) * sizeof(char));
+   malloc((strlen(filename) + strlen(OUTPUT_SUFFIX_VCSFMT) + 1) * sizeof(char));
   strcpy(output_file_name, filename);
-  strcat(output_file_name, OUTPUT_SUFFIX);
+  strcat(output_file_name, OUTPUT_SUFFIX_VCSFMT);
 
   char * full_out_file_path;
   if (strcmp(output_file_path, "") != 0) {
@@ -107,7 +104,10 @@ void vcsfmt(char * filename, char * output_file_path) {
 
   // we know the threads will complete in this order
   // because of the queue pipelines
+
+  PRINT_ERROR("HERE1");
   g_thread_join(read_block_thread);
+  PRINT_ERROR("HERE2");
   g_thread_join(process_block_thread);
   g_thread_join(write_block_thread);
 
@@ -123,8 +123,10 @@ void vcsfmt(char * filename, char * output_file_path) {
                  input_block_with_size, output_block_with_size, is_within_orf,
                  cur_orf_pos, current_codon_frame, feof(input_file)));
   }
-
 #endif
+
+  fputc(NEWLINE, output_file);
+
   // error handling
   if (ferror(input_file) && !feof(input_file)) {
     PRINT_ERROR("Error in reading from input file.");
@@ -180,12 +182,11 @@ void vcsfmt(char * filename, char * output_file_path) {
 void de_vcsfmt(char * filename, char * output_file_path) {
   FILE * input_file = open_file_read(filename);
   PRINT_ERROR_AND_RETURN_IF_NULL(input_file, "Error in creating input file.");
-  // create filename long enough to concatenate filename and suffix
-  // assume filename ends in .vcsfmt (7 chars)
-  char * output_file_name =
-   malloc((strlen(filename) - strlen(OUTPUT_SUFFIX)) * sizeof(char));
-  strncpy(output_file_name, filename, strlen(filename) - strlen(OUTPUT_SUFFIX));
-  output_file_name[ strlen(filename) - strlen(OUTPUT_SUFFIX) ] = '\0';
+
+  char * output_file_name = malloc(
+   (strlen(filename) + strlen(OUTPUT_SUFFIX_DE_VCSFMT) + 1) * sizeof(char));
+  strcpy(output_file_name, filename);
+  strcat(output_file_name, OUTPUT_SUFFIX_DE_VCSFMT);
 
   char * full_out_file_path;
   if (strcmp(output_file_path, "") != 0) {
@@ -196,13 +197,33 @@ void de_vcsfmt(char * filename, char * output_file_path) {
   FILE * output_file = create_file_binary_write(full_out_file_path);
   PRINT_ERROR_AND_RETURN_IF_NULL(output_file, "Error in creating output file.");
 
+#ifndef CONCURRENT
   string_with_size * input_block_with_size =
    make_new_string_with_size(BIN_BLOCK_SIZE);
   string_with_size * output_block_with_size =
    make_new_string_with_size(2 * BIN_BLOCK_SIZE); // TODO: fix mem size here
+#endif
 
-  int * cur_posn_in_line = malloc(sizeof(int));
+  unsigned long long * cur_posn_in_line = malloc(sizeof(int));
   *cur_posn_in_line = 0;
+
+#ifdef CONCURRENT
+// #ifdef MEMPOOL
+//   g_mutex_init(&modify_sws_mempools_mutex);
+//   add_string_with_size_pool(BIN_BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
+//   add_string_with_size_pool(2 * BIN_BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
+// #endif
+//   GAsyncQueue * read_queue = g_async_queue_new();
+//   GAsyncQueue * write_queue = g_async_queue_new();
+//   volatile bool * is_reading_complete = malloc(sizeof(bool));
+//   *is_reading_complete = false;
+//   volatile bool * is_processing_complete = malloc(sizeof(bool));
+//   *is_processing_complete = false;
+//   GMutex * read_complete_mutex = malloc(sizeof(GMutex));
+//   g_mutex_init(read_complete_mutex);
+//   GMutex * process_complete_mutex = malloc(sizeof(GMutex));
+//   g_mutex_init(process_complete_mutex);
+#else
   while (!((feof(input_file)) || ferror(input_file)) && !ferror(output_file)) {
     // Read a block of genetic data
     read_block(input_file, input_block_with_size);
@@ -211,12 +232,10 @@ void de_vcsfmt(char * filename, char * output_file_path) {
                                                      output_block_with_size,
                                                      cur_posn_in_line));
   }
+#endif
+
   fputc(NEWLINE, output_file);
 
-  // cleanup mem
-  free(output_file_name);
-  free_string_with_size(input_block_with_size);
-  free_string_with_size(output_block_with_size);
   if (ferror(input_file) && !feof(input_file)) {
     PRINT_ERROR("Error in reading from input file.");
   } else if (ferror(output_file) && !feof(input_file)) {
@@ -229,4 +248,11 @@ void de_vcsfmt(char * filename, char * output_file_path) {
   // close open handles
   fclose(input_file);
   fclose(output_file);
+  // cleanup mem
+  free(output_file_name);
+#ifdef CONCURRENT
+#else
+  free_string_with_size(input_block_with_size);
+  free_string_with_size(output_block_with_size);
+#endif
 }
