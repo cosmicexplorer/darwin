@@ -31,11 +31,18 @@ string_with_size *
 }
 #endif
 #else
+
 string_with_size_pools sws_mempools = {NULL, 0, NULL};
+
+GMutex modify_sws_mempools_mutex;
 
 void add_string_with_size_pool(unsigned long long size_in_mem,
                                size_t num_elems) {
+  g_mutex_lock(&modify_sws_mempools_mutex);
+
   size_t prev_num_pools = sws_mempools.num_sws_mempools;
+  // GAsyncQueue ** new_mempools = malloc((prev_num_pools + 1) *
+  // sizeof(GQueue));
   GQueue ** new_mempools = malloc((prev_num_pools + 1) * sizeof(GQueue));
   unsigned long long * new_mempool_sizes =
    malloc((prev_num_pools + 1) * sizeof(unsigned long long));
@@ -69,6 +76,7 @@ void add_string_with_size_pool(unsigned long long size_in_mem,
   ++sws_mempools.num_sws_mempools;
   free(sws_mempools.mempool_size_in_mem);
   sws_mempools.mempool_size_in_mem = new_mempool_sizes;
+  g_mutex_unlock(&modify_sws_mempools_mutex);
 }
 
 string_with_size *
@@ -84,8 +92,12 @@ string_with_size *
 }
 
 string_with_size * make_new_string_with_size_from_pool(size_t mempool_index) {
+  g_mutex_lock(&modify_sws_mempools_mutex);
   if (g_queue_get_length(sws_mempools.mempools[ mempool_index ]) > 0) {
-    return g_queue_pop_head(sws_mempools.mempools[ mempool_index ]);
+    string_with_size * sws_to_return =
+     g_queue_pop_head(sws_mempools.mempools[ mempool_index ]);
+    g_mutex_unlock(&modify_sws_mempools_mutex);
+    return sws_to_return;
   } else {
     string_with_size * sws_to_return = malloc(sizeof(string_with_size));
     // get size in mem from sws_mempools, and allocate that much
@@ -95,17 +107,31 @@ string_with_size * make_new_string_with_size_from_pool(size_t mempool_index) {
     sws_to_return->size_in_memory =
      sws_mempools.mempool_size_in_mem[ mempool_index ];
     sws_to_return->mempool_index = mempool_index;
+    g_mutex_unlock(&modify_sws_mempools_mutex);
     return sws_to_return;
   }
 }
 
 void free_string_with_size_to_pool(void * arg) {
   if (NULL != arg) {
+    g_mutex_lock(&modify_sws_mempools_mutex);
     string_with_size * sws = (string_with_size *) arg;
     sws->readable_bytes = 0; // make it clean
     g_queue_push_tail(sws_mempools.mempools[ sws->mempool_index ], sws);
+    g_mutex_unlock(&modify_sws_mempools_mutex);
   }
 }
+
+void free_string_with_size_mem_pools(void) {
+  for (size_t pool_index = 0; pool_index < sws_mempools.num_sws_mempools;
+       ++pool_index) {
+    g_queue_free_full(sws_mempools.mempools[ pool_index ],
+                      free_string_with_size);
+  }
+  free(sws_mempools.mempools);
+  free(sws_mempools.mempool_size_in_mem);
+}
+
 #endif
 // TODO: javadoc
 string_with_size *

@@ -53,6 +53,8 @@ int main(int argc, char ** argv) {
       return -1;
     }
   }
+  // TODO: figure out why there's four bytes not freed here
+  g_slist_free(args.files);
 }
 
 void format_file_arg(char * filename) {

@@ -158,9 +158,10 @@ string_with_size * process_block_vcsfmt(string_with_size * input_block,
                                         unsigned long long * cur_orf_pos,
                                         char * current_codon_frame,
                                         bool is_final_block) {
-  output_block->readable_bytes = 0;
+  set_string_with_size_readable_bytes(output_block, 0);
   for (unsigned long long codon_index = 0;
        codon_index < input_block->readable_bytes; ++codon_index) {
+    // TODO: figure out why valgrind is saying there's an uninitialized value
     while (NEWLINE == input_block->string[ codon_index ] &&
            codon_index < input_block->readable_bytes) {
       ++codon_index;

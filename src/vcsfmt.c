@@ -44,6 +44,7 @@ void vcsfmt(char * filename, char * output_file_path) {
 #ifdef CONCURRENT
 #ifdef MEMPOOL
   // create string_with_size memory pools
+  g_mutex_init(&modify_sws_mempools_mutex);
   add_string_with_size_pool(BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
   add_string_with_size_pool(BIN_BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
 #endif
@@ -89,6 +90,9 @@ void vcsfmt(char * filename, char * output_file_path) {
   args_to_write_block->is_processing_complete = is_processing_complete;
   args_to_write_block->process_complete_mutex = process_complete_mutex;
 
+  // PIPELINE!!!
+  // read_block_thread -> process_block_thread -> write_block_thread
+
   GThread * read_block_thread =
    g_thread_new("read_block_thread", (GThreadFunc) concurrent_read_block_vcsfmt,
                 args_to_read_block);
@@ -101,7 +105,7 @@ void vcsfmt(char * filename, char * output_file_path) {
    "write_block_thread", (GThreadFunc) concurrent_write_block_vcsfmt,
    args_to_write_block);
 
-  // we know the threads will line up this way
+  // we know the threads will complete in this order
   // because of the queue pipelines
   g_thread_join(read_block_thread);
   g_thread_join(process_block_thread);
@@ -134,17 +138,39 @@ void vcsfmt(char * filename, char * output_file_path) {
 
 // cleanup allocated memory and open handles
 #ifdef CONCURRENT
+  free(args_to_read_block);
+  free(args_to_block_processing);
+  free(args_to_write_block);
   // TODO: fix mutex and thread memory leaks (if they actually exist???)
   g_async_queue_unref(read_queue);
   g_async_queue_unref(write_queue);
-  // TODO: don't leak mem
+// TODO: don't leak mem
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic warning "-W#warnings"
+#warning THE CAST HERE IS IFFY AND SHOULD BE FIXED; HOW TO FREE VOLATILE PTR?
+  free((void *) is_reading_complete);
+  free((void *) is_processing_complete);
+#pragma GCC diagnostic pop
+#else
+#warning NON-GCC/CLANG COMPILERS NOT YET SUPPORTED
+#endif
   g_mutex_clear(read_complete_mutex);
   g_mutex_clear(process_complete_mutex);
+  free(read_complete_mutex);
+  free(process_complete_mutex);
+#ifdef MEMPOOL
+  g_mutex_clear(&modify_sws_mempools_mutex);
+  free_string_with_size_mem_pools();
+#endif
 #else
   free_string_with_size(input_block_with_size);
   free_string_with_size(output_block_with_size);
 #endif
   free(output_file_name);
+  free(is_within_orf);
+  free(cur_orf_pos);
+  free(current_codon_frame);
   // close open handles
   fclose(input_file);
   fclose(output_file);

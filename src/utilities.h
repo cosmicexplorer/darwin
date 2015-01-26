@@ -125,6 +125,7 @@ typedef struct {
 } string_with_size_pools;
 
 extern string_with_size_pools sws_mempools;
+extern GMutex modify_sws_mempools_mutex;
 
 void add_string_with_size_pool(unsigned long long size_in_mem,
                                size_t num_elems);
@@ -136,6 +137,8 @@ string_with_size *
 string_with_size * make_new_string_with_size_from_pool(size_t mempool_index);
 
 void free_string_with_size_to_pool(void * arg);
+
+void free_string_with_size_mem_pools(void);
 
 #endif
 
