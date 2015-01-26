@@ -144,17 +144,9 @@ void vcsfmt(char * filename, char * output_file_path) {
   // TODO: fix mutex and thread memory leaks (if they actually exist???)
   g_async_queue_unref(read_queue);
   g_async_queue_unref(write_queue);
-// TODO: don't leak mem
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic warning "-W#warnings"
-#warning THE CAST HERE IS IFFY AND SHOULD BE FIXED; HOW TO FREE VOLATILE PTR?
+  // TODO: don't leak mem
   free((void *) is_reading_complete);
   free((void *) is_processing_complete);
-#pragma GCC diagnostic pop
-#else
-#warning NON-GCC/CLANG COMPILERS NOT YET SUPPORTED
-#endif
   g_mutex_clear(read_complete_mutex);
   g_mutex_clear(process_complete_mutex);
   free(read_complete_mutex);
@@ -302,16 +294,8 @@ void de_vcsfmt(char * filename, char * output_file_path) {
   // TODO: fix mutex and thread memory leaks (if they actually exist???)
   g_async_queue_unref(read_queue);
   g_async_queue_unref(write_queue);
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic warning "-W#warnings"
-#warning THE CAST HERE IS IFFY AND SHOULD BE FIXED; HOW TO FREE VOLATILE PTR?
   free((void *) is_reading_complete);
   free((void *) is_processing_complete);
-#pragma GCC diagnostic pop
-#else
-#warning NON-GCC/CLANG COMPILERS NOT YET SUPPORTED
-#endif
   g_mutex_clear(read_complete_mutex);
   g_mutex_clear(process_complete_mutex);
   free(read_complete_mutex);

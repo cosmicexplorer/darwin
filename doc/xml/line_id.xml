@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<category id="line_id" name="line_id" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <structtemplate name="line_id" ref="line_id::line_id#line_id::line_id">
+    <brief> aggregate structure representing the identity of a line</brief>
+  </structtemplate>
+  <function id="make_line_id" name="make_line_id">
+    <brief> allocate and initialize a line_id</brief>
+    <return>
+      <doc>constructed line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="make_line_id::str_hash" name="str_hash">
+      <doc>hash to begin with</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+    <argument id="make_line_id::str_length" name="str_length">
+      <doc>length to begin with</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+  </function>
+  <function id="make_line_id_given_string_with_size" name="make_line_id_given_string_with_size">
+    <brief> allocate and initialize a line_id given a string_with_size argument</brief>
+    <return>
+      <doc>constructed line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="make_line_id_given_string_with_size::str_hash" name="str_hash">
+      <doc>hash to begin with</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+    <argument id="make_line_id_given_string_with_size::str_length" name="str_length">
+      <doc>length to begin with</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+    <argument id="make_line_id_given_string_with_size::str_k_chars" name="str_k_chars">
+      <doc>characters to draw from</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="free_line_id" name="free_line_id">
+    <brief> free memory allocated by constructing a line_id</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="free_line_id::arg" name="arg">
+      <type builtin="yes" name="void" qualifier="*" />
+    </argument>
+  </function>
+</category>

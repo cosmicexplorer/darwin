@@ -289,7 +289,8 @@ void concurrent_read_block_vcsfmt(concurrent_read_block_args_vcsfmt * args) {
     read_block(args->input_file, args->input_block_with_size);
     if (feof(args->input_file)) {
       g_mutex_lock(args->read_complete_mutex);
-      // TODO: figure out GAsyncQueue is reporting a size of -1 here sometimes!
+      // TODO: figure out GAsyncQueue is reporting a size of -1 here
+      // sometimes! THIS IS WHY THE DEADLOCK IS OCCURRING
       fprintf(stderr, "in queue size: %d\n",
               g_async_queue_length(args->read_queue));
     }

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<typedef id="levenshtein_string_edit_operation" name="levenshtein_string_edit_operation" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <doc>
+* insert: left one
+* delete: up one
+* sub: up &amp; left
+* match: up &amp; left
+</doc>
+  <type name="levenshtein_string_edit_operation" ref="index#(anonymous::1)" />
+  <function id="convert_leven_op_to_char" name="convert_leven_op_to_char">
+    <return>
+      <type builtin="yes" name="char" />
+    </return>
+    <argument id="convert_leven_op_to_char::cur_op" name="cur_op">
+      <type name="levenshtein_string_edit_operation" ref="levenshtein_string_edit_operation#levenshtein_string_edit_operation" />
+    </argument>
+  </function>
+  <function id="write_leven_char_to_index_of_string" name="write_leven_char_to_index_of_string">
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_leven_char_to_index_of_string::cur_op" name="cur_op">
+      <type name="levenshtein_string_edit_operation" qualifier="*" ref="levenshtein_string_edit_operation#levenshtein_string_edit_operation" />
+    </argument>
+    <argument id="write_leven_char_to_index_of_string::swsai" name="swsai">
+      <type name="string_with_size_and_index" qualifier="*" ref="string_with_size_and_index#string_with_size_and_index" />
+    </argument>
+  </function>
+</typedef>

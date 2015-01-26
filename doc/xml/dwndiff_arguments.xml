@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate id="dwndiff_arguments" name="dwndiff_arguments" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief>used to communicate with parse_opt</brief>
+  <field id="dwndiff_arguments::files" name="files">
+    <type name="GSList" qualifier="*" />
+  </field>
+  <field id="dwndiff_arguments::is_zip" name="is_zip">
+    <type builtin="yes" name="bool" />
+  </field>
+  <field id="dwndiff_arguments::is_compare" name="is_compare">
+    <type builtin="yes" name="bool" />
+  </field>
+  <field id="dwndiff_arguments::is_unzip" name="is_unzip">
+    <type builtin="yes" name="int" />
+  </field>
+  <field id="dwndiff_arguments::output_file_path" name="output_file_path">
+    <type builtin="yes" name="char" qualifier="*" />
+  </field>
+  <field id="dwndiff_arguments::width" name="width">
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <field id="dwndiff_arguments::is_verbose" name="is_verbose">
+    <type builtin="yes" name="bool" />
+  </field>
+  <field id="dwndiff_arguments::has_no_args" name="has_no_args">
+    <type builtin="yes" name="bool" />
+  </field>
+  <function id="initialize_dwndiff_arguments" name="initialize_dwndiff_arguments">
+    <brief>CTOR</brief>
+    <return>
+      <type name="dwndiff_arguments" ref="dwndiff_arguments#dwndiff_arguments" />
+    </return>
+    <argument id="initialize_dwndiff_arguments::args" name="args">
+      <type name="dwndiff_arguments" ref="dwndiff_arguments#dwndiff_arguments" />
+    </argument>
+  </function>
+</structtemplate>

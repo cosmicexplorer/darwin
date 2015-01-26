@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="queue_processing::line_id_with_edit_match_info" name="line_id_with_edit_match_info" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief>helper struct to carry line_id and edit matching info in glib for_each</brief>
+  <field id="queue_processing::line_id_with_edit_match_info::id" name="id">
+    <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+  </field>
+  <field id="queue_processing::line_id_with_edit_match_info::is_leven_found" name="is_leven_found">
+    <brief>whether a string with a sufficiently close levenshtein distance exists</brief>
+    <type builtin="yes" name="bool" />
+  </field>
+  <field id="queue_processing::line_id_with_edit_match_info::edit_matches" name="edit_matches">
+    <brief>list of all such strings</brief>
+    <type name="GSList" qualifier="**" />
+  </field>
+</structtemplate>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="levenshtein_matrix_state" name="levenshtein_matrix_state" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <field id="cur_cell" name="cur_cell">
+    <type builtin="yes" name="unsigned long long" qualifier="*" />
+  </field>
+  <field id="cur_x" name="cur_x">
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <field id="cur_y" name="cur_y">
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <field id="max_y" name="max_y">
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <function id="get_next_levenshtein_operation_and_advance" name="get_next_levenshtein_operation_and_advance">
+    <brief>TODO: javadoc, including that as a precondition all up/left/up&amp;left moves</brief>
+    <doc>are
+still within the array, and that cur_cell is NOT the base array index, it
+is
+the address of the active cell
+mention that also advances cur cell in an atomic fashion which is kinda
+cool</doc>
+    <return>
+      <type name="levenshtein_string_edit_operation" ref="levenshtein_string_edit_operation#levenshtein_string_edit_operation" />
+    </return>
+    <argument id="get_next_levenshtein_operation_and_advance::lms" name="lms">
+      <type name="levenshtein_matrix_state" qualifier="*" ref="levenshtein_matrix_state#levenshtein_matrix_state" />
+    </argument>
+  </function>
+</structtemplate>

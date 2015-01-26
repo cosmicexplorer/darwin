@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<category id="vcsfmt" name="vcsfmt" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <function id="vcsfmt" name="vcsfmt">
+    <brief> Produces formatted file with extension ".vcsfmt".</brief>
+    <doc>vcsfmt file produced in same directory as given file.
+This method simply forwards to the appropriate strategy depending
+on the original format of the file (FASTA, Genebank, etc.)
+
+TODO: redo cldoc so that it has all args</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="vcsfmt::filename" name="filename">
+      <doc>the file to produce a vcsfmt file from.</doc>
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="vcsfmt::output_file_path" name="output_file_path">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+  </function>
+  <function id="de_vcsfmt" name="de_vcsfmt">
+    <brief> Produces unformatted file from vcsfmt file.</brief>
+    <doc>Unformatted file produced in same directory as vcsfmt file.
+This method simply forwards to the appropriate strategy depending
+on the original format of the file (FASTA, Genebank, etc.)
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="de_vcsfmt::filename" name="filename">
+      <doc>the file to produce an unformatted version of.</doc>
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="de_vcsfmt::output_file_path" name="output_file_path">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+  </function>
+</category>

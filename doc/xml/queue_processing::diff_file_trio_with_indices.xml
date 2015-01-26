@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="queue_processing::diff_file_trio_with_indices" name="diff_file_trio_with_indices" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief>helper struct used for glib for_each</brief>
+  <field id="queue_processing::diff_file_trio_with_indices::prev_file" name="prev_file">
+    <brief>FILE * to prev file</brief>
+    <type name="FILE" qualifier="*" />
+  </field>
+  <field id="queue_processing::diff_file_trio_with_indices::prev_file_index" name="prev_file_index">
+    <brief>index into prev file</brief>
+    <type name="mpz_t" qualifier="*" />
+  </field>
+  <field id="queue_processing::diff_file_trio_with_indices::cur_file" name="cur_file">
+    <brief>FILE * to cur file</brief>
+    <type name="FILE" qualifier="*" />
+  </field>
+  <field id="queue_processing::diff_file_trio_with_indices::cur_file_index" name="cur_file_index">
+    <brief>index into cur file</brief>
+    <type name="mpz_t" qualifier="*" />
+  </field>
+  <field id="queue_processing::diff_file_trio_with_indices::out_file" name="out_file">
+    <brief>FILE * to output file</brief>
+    <type name="FILE" qualifier="*" />
+  </field>
+</structtemplate>

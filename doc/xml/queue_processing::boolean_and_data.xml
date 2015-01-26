@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="queue_processing::boolean_and_data" name="boolean_and_data" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief>helper struct used in glib for_each loops</brief>
+  <field id="queue_processing::boolean_and_data::data" name="data">
+    <brief>arbitrary data to hold</brief>
+    <type builtin="yes" name="void" qualifier="*" />
+  </field>
+  <field id="queue_processing::boolean_and_data::boolean" name="boolean">
+    <brief>boolean to represent something</brief>
+    <type builtin="yes" name="bool" />
+  </field>
+</structtemplate>

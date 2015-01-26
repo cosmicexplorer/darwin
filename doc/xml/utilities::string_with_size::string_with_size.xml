@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="utilities::string_with_size::string_with_size" name="string_with_size" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief> used to return a char string, along with size information</brief>
+  <doc>readable_bytes is used by functions like fread because while
+they will typically fill the entire memory space sometimes they do less, upon
+reaching EOF or some other ferror
+</doc>
+  <field id="utilities::string_with_size::string_with_size::string" name="string">
+    <brief>pointer to character string, NOT null-terminated!</brief>
+    <type builtin="yes" name="char" qualifier="*" />
+  </field>
+  <field id="utilities::string_with_size::string_with_size::readable_bytes" name="readable_bytes">
+    <brief>current number of useful bytes this is storing</brief>
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <field id="utilities::string_with_size::string_with_size::size_in_memory" name="size_in_memory">
+    <brief>full size of char * in bytes</brief>
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+  <function id="set_string_with_size_readable_bytes" name="set_string_with_size_readable_bytes">
+    <brief> helper function to set readable_bytes of a string_with_size</brief>
+    <return>
+      <doc>modified string_with_size</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="set_string_with_size_readable_bytes::sws" name="sws">
+      <doc>string_with_size to set</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="set_string_with_size_readable_bytes::readable_bytes" name="readable_bytes">
+      <doc>logical (not memory) size to set to</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="copy_string_with_size" name="copy_string_with_size">
+    <brief> copies data from a string_with_size into another</brief>
+    <doc>note: to_sws-&gt;size_in_memory &gt; from_sws-&gt;readable_bytes, or this will
+segfault
+
+</doc>
+    <return>
+      <doc>copied string_with_size</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="copy_string_with_size::from_sws" name="from_sws">
+      <doc>string_with_size to copy from</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="copy_string_with_size::to_sws" name="to_sws">
+      <doc>string_with_size to copy to</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="grow_string_with_size" name="grow_string_with_size">
+    <brief> increases size_in_memory of string_with_size if neccesary, copying over data</brief>
+    <doc>note: does nothing if growth is not required
+
+</doc>
+    <return>
+      <doc>possibly-grown string_with_size</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="grow_string_with_size::sws" name="sws">
+      <doc>pointer to string_with_size to grow</doc>
+      <type name="string_with_size" qualifier="**" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="grow_string_with_size::final_size_in_mem" name="final_size_in_mem">
+      <doc>final size to grow to</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+</structtemplate>

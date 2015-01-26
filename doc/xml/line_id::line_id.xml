@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="line_id::line_id" name="line_id" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief> aggregate structure representing the identity of a line</brief>
+  <field id="line_id::line_id::line_number" name="line_number">
+    <brief>gmp bignum representing line number</brief>
+    <type name="mpz_t" />
+  </field>
+  <field id="line_id::line_id::str_hash" name="str_hash">
+    <brief>hash of line</brief>
+    <type builtin="yes" name="unsigned long" />
+  </field>
+  <field id="line_id::line_id::str_length" name="str_length">
+    <brief>length of line</brief>
+    <type builtin="yes" name="unsigned long" />
+  </field>
+  <field id="line_id::line_id::first_k_chars" name="first_k_chars">
+    <brief>first k characters of string, where k is defined previously</brief>
+    <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+  </field>
+  <field id="line_id::line_id::is_orf" name="is_orf">
+    <brief>whether line is an orf</brief>
+    <type builtin="yes" name="bool" />
+  </field>
+  <function id="line_id_set_is_orf" name="line_id_set_is_orf">
+    <brief> set is_orf to given value</brief>
+    <return>
+      <doc>modified line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_set_is_orf::sid" name="sid">
+      <doc>line_id to modify</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_set_is_orf::set_is_orf" name="set_is_orf">
+      <doc>boolean to send</doc>
+      <type builtin="yes" name="bool" />
+    </argument>
+  </function>
+  <function id="line_id_set_str_hash" name="line_id_set_str_hash">
+    <brief> set str_hash to given value</brief>
+    <return>
+      <doc>modified line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_set_str_hash::sid" name="sid">
+      <doc>line_id to modify</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_set_str_hash::str_hash" name="str_hash">
+      <doc>value to set to</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+  </function>
+  <function id="line_id_set_str_length" name="line_id_set_str_length">
+    <brief> set str_length to given value</brief>
+    <return>
+      <doc>modified line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_set_str_length::sid" name="sid">
+      <doc>line_id to modify</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_set_str_length::str_length" name="str_length">
+      <doc>value to set to</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+  </function>
+  <function id="line_id_set_line_number" name="line_id_set_line_number">
+    <brief> set line_number to given value</brief>
+    <return>
+      <doc>modified line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_set_line_number::sid" name="sid">
+      <doc>line_id to modify</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_set_line_number::number_to_set_to" name="number_to_set_to">
+      <doc>value to set to</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+  </function>
+  <function id="line_id_initialize_line_number" name="line_id_initialize_line_number">
+    <brief> initialize line_number data member</brief>
+    <return>
+      <doc>initialized line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_initialize_line_number::sid" name="sid">
+      <doc>line_id to initialize</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+  </function>
+  <function id="line_id_set_first_k_chars" name="line_id_set_first_k_chars">
+    <brief> set first_k_chars to given value</brief>
+    <return>
+      <doc>modified line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="line_id_set_first_k_chars::sid" name="sid">
+      <doc>line_id to modify</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_set_first_k_chars::str_k_chars" name="str_k_chars">
+      <doc>value to set to</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="clone_line_id_with_string_null" name="clone_line_id_with_string_null">
+    <brief> return a newly allocated clone of the given line_id</brief>
+    <return>
+      <doc>clone of given line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </return>
+    <argument id="clone_line_id_with_string_null::base" name="base">
+      <doc>line_id to clone</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+  </function>
+  <function id="line_id_equal" name="line_id_equal">
+    <brief> test if two line_id objects are equal</brief>
+    <return>
+      <doc>whether the two are equal</doc>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="line_id_equal::a" name="a">
+      <doc>pointer to one line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="line_id_equal::b" name="b">
+      <doc>pointer to another line_id</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+  </function>
+  <function id="set_bool_if_line_id_match" name="set_bool_if_line_id_match">
+    <brief> set boolean to true if line_ids in arguments match</brief>
+    <doc>compiler will emit a non-inline version of this, since a pointer is taken to
+it when g_queue_foreach is used
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="set_bool_if_line_id_match::prev_line_id" name="prev_line_id">
+      <doc>line_id of some line in prev file</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="set_bool_if_line_id_match::bool_data_bundle" name="bool_data_bundle">
+      <doc>boolean_and_data containing some boolean and a line_id for
+cur_file</doc>
+      <type name="boolean_and_data" qualifier="*" ref="queue_processing::boolean_and_data#queue_processing::boolean_and_data" />
+    </argument>
+  </function>
+  <function id="make_line_id_pair" name="make_line_id_pair">
+    <brief> constructs a line_id_pair given two live line_ids</brief>
+    <return>
+      <doc>constructed line_id_pair</doc>
+      <type name="line_id_pair" qualifier="*" ref="queue_processing::line_id_pair#queue_processing::line_id_pair" />
+    </return>
+    <argument id="make_line_id_pair::prev" name="prev">
+      <doc>line_id from prev file</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="make_line_id_pair::cur" name="cur">
+      <doc>line_id from cur file</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+  </function>
+  <function id="if_close_levenshtein_dist_add_to_list" name="if_close_levenshtein_dist_add_to_list">
+    <brief> create line_id_pair and add to list if line_ids are similar by levenshtein</brief>
+    <doc>compiler will emit a non-inline version of this too, since a pointer is taken
+to it when g_queue_foreach is used
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="if_close_levenshtein_dist_add_to_list::prev_line_id" name="prev_line_id">
+      <doc>line_id from prev file</doc>
+      <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+    </argument>
+    <argument id="if_close_levenshtein_dist_add_to_list::cur_data" name="cur_data">
+      <doc>line_id_with_edit_match_info containing line_id from cur file</doc>
+      <type name="line_id_with_edit_match_info" qualifier="*" ref="queue_processing::line_id_with_edit_match_info#queue_processing::line_id_with_edit_match_info" />
+    </argument>
+  </function>
+</structtemplate>

@@ -64,7 +64,7 @@
 // x is vertical (downwards), y is horizontal (rightwards)
 #define TWO_D_ARRAY_INDEX(arr, x, y, max_y) (arr)[ (x) * (max_y) + (y) ]
 
-//* cldoc:begin-category(utilities::file functions) */
+/* cldoc:begin-category(utilities::file functions) */
 /* creates a new FILE * by opening a file with the given name for reading
  * @filename name of file to read from
  *

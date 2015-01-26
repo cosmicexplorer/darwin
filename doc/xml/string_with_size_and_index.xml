@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="string_with_size_and_index" name="string_with_size_and_index" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <field id="sws" name="sws">
+    <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+  </field>
+  <field id="index" name="index">
+    <type builtin="yes" name="unsigned long long" />
+  </field>
+</structtemplate>

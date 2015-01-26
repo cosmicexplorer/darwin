@@ -33,12 +33,14 @@ const char * start_codons[ NUMBER_OF_START_CODONS ] = {
 };
 #endif
 
-#endif
-
-#if defined EUKARYOTE
+#elif defined EUKARYOTE
 #define NUMBER_OF_START_CODONS 1
 const char * start_codons[ NUMBER_OF_START_CODONS ] = {"ATG"};
 // eukaryotes rarely use anything other than ATG
+
+#else
+#define NUMBER_OF_START_CODONS 1
+const char * start_codons[ NUMBER_OF_START_CODONS ] = {"ATG"};
 #endif
 
 // stop codons

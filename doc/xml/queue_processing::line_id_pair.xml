@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structtemplate anonymous="yes" id="queue_processing::line_id_pair" name="line_id_pair" typedef="yes" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <brief>helper struct to carry a pair of line_ids around</brief>
+  <field id="queue_processing::line_id_pair::prev_id" name="prev_id">
+    <brief>line_id from prev file</brief>
+    <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+  </field>
+  <field id="queue_processing::line_id_pair::cur_id" name="cur_id">
+    <brief>line_id from cur file</brief>
+    <type name="line_id" qualifier="*" ref="line_id::line_id#line_id::line_id" />
+  </field>
+  <function id="print_levenshtein_smallest_edits_to_out_file" name="print_levenshtein_smallest_edits_to_out_file">
+    <brief> send optimal levenshtein distance string_with_size to given file</brief>
+    <doc>since address being taken for use in for_each, compiler will also emit
+non-inline version
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="print_levenshtein_smallest_edits_to_out_file::arg" name="arg">
+      <doc>the line_id_pair to compare and get levenshtein distance string from</doc>
+      <type name="line_id_pair" qualifier="*" ref="queue_processing::line_id_pair#queue_processing::line_id_pair" />
+    </argument>
+    <argument id="print_levenshtein_smallest_edits_to_out_file::files_and_indices" name="files_and_indices">
+      <doc>metadata indicating where to get levenshtein distances</doc>
+      <type name="diff_file_trio_with_indices" qualifier="*" ref="queue_processing::diff_file_trio_with_indices#queue_processing::diff_file_trio_with_indices" />
+    </argument>
+  </function>
+</structtemplate>

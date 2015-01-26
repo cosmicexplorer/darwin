@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<category id="utilities::file functions" name="file functions" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <function id="open_file_read" name="open_file_read">
+    <brief> creates a new FILE * by opening a file with the given name for reading</brief>
+    <return>
+      <doc>FILE * to intended file</doc>
+      <type name="FILE" qualifier="*" />
+    </return>
+    <argument id="open_file_read::filename" name="filename">
+      <doc>name of file to read from</doc>
+      <type builtin="yes" name="char" qualifier=" const *" />
+    </argument>
+  </function>
+  <function id="create_file_binary_write" name="create_file_binary_write">
+    <brief> creates a new FILE * by opening a file with the given name for writing</brief>
+    <doc>Note: truncates file if already exists
+
+</doc>
+    <return>
+      <doc>FILE * to intended file</doc>
+      <type name="FILE" qualifier="*" />
+    </return>
+    <argument id="create_file_binary_write::filename" name="filename">
+      <doc>name of file to write to</doc>
+      <type builtin="yes" name="char" qualifier=" const *" />
+    </argument>
+  </function>
+</category>

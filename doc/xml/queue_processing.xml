@@ -1,0 +1,361 @@
+<?xml version='1.0' encoding='utf-8'?>
+<category id="queue_processing" name="queue_processing" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <structtemplate name="boolean_and_data" ref="queue_processing::boolean_and_data#queue_processing::boolean_and_data">
+    <brief>helper struct used in glib for_each loops</brief>
+  </structtemplate>
+  <function id="is_cur_line_in_prev_queue" name="is_cur_line_in_prev_queue">
+    <brief> return true if current line is in previous line queue</brief>
+    <return>
+      <doc>whether the line_id at top of cur_file_queue matches any line_id in
+prev_file_queue</doc>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="is_cur_line_in_prev_queue::prev_file_queue" name="prev_file_queue">
+      <doc>queue of line_ids of lines of prev file</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="is_cur_line_in_prev_queue::cur_file_queue" name="cur_file_queue">
+      <doc>queue of line_ids of lines of cur file</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+  </function>
+  <structtemplate name="line_id_pair" ref="queue_processing::line_id_pair#queue_processing::line_id_pair">
+    <brief>helper struct to carry a pair of line_ids around</brief>
+  </structtemplate>
+  <function id="free_line_id_pair" name="free_line_id_pair">
+    <brief> frees a line_id_pair</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="free_line_id_pair::arg" name="arg">
+      <doc>line_id_pair to deallocate memory for</doc>
+      <type builtin="yes" name="void" qualifier="*" />
+    </argument>
+  </function>
+  <structtemplate name="line_id_with_edit_match_info" ref="queue_processing::line_id_with_edit_match_info#queue_processing::line_id_with_edit_match_info">
+    <brief>helper struct to carry line_id and edit matching info in glib for_each</brief>
+  </structtemplate>
+  <function id="get_if_edit_line_and_if_so_add_to_list" name="get_if_edit_line_and_if_so_add_to_list">
+    <brief> if line on top of cur_file_queue is close to a previous line, add it to list</brief>
+    <return>
+      <doc>whether exists a close line, and if so which one</doc>
+      <type name="boolean_and_data" ref="queue_processing::boolean_and_data#queue_processing::boolean_and_data" />
+    </return>
+    <argument id="get_if_edit_line_and_if_so_add_to_list::prev_file_queue" name="prev_file_queue">
+      <doc>queue of previous line_ids</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="get_if_edit_line_and_if_so_add_to_list::cur_file_queue" name="cur_file_queue">
+      <doc>queue of current line_ids (only top used)</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="get_if_edit_line_and_if_so_add_to_list::edit_matches" name="edit_matches">
+      <doc>list of line_id_pairs of lines which are similar to one another</doc>
+      <type name="GSList" qualifier="**" />
+    </argument>
+  </function>
+  <function id="write_line_and_if_new_add_to_list" name="write_line_and_if_new_add_to_list">
+    <brief> takes in files and writes lines from one to another as appropriate</brief>
+    <doc>CLOBBERS LINES_PROCESSED ARGUMENTS by setting them to their new appropriate
+values
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_line_and_if_new_add_to_list::prev_file_line_ids_queue" name="prev_file_line_ids_queue">
+      <doc>queue of line_ids from prev file</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::cur_file_line_ids_queue" name="cur_file_line_ids_queue">
+      <doc>queue of line_ids from cur file</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::current_streak_of_newly_added_lines" name="current_streak_of_newly_added_lines">
+      <doc>current number of lines added; if too
+many, stop the process altogether to avoid pathological inputs</doc>
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::input_file_lines_processed_for_edits" name="input_file_lines_processed_for_edits">
+      <doc>index into input file</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::cur_file_lines_processed" name="cur_file_lines_processed">
+      <doc>FILE * of cur file</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::output_file_lines_processed" name="output_file_lines_processed">
+      <doc>index into output file</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::break_out_of_vcscmp" name="break_out_of_vcscmp">
+      <doc>whether too many new lines have been found in cur file:
+if so, stop to avoid pathological inputs</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::edit_matches" name="edit_matches">
+      <doc>list of similar line_id_pairs by levenshtein distance</doc>
+      <type name="GSList" qualifier="**" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::prev_file_used_for_edits" name="prev_file_used_for_edits">
+      <doc>FILE * of prev file</doc>
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::cur_file" name="cur_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_line_and_if_new_add_to_list::out_file" name="out_file">
+      <doc>FILE * of output file</doc>
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+  <function id="initialize_line_id" name="initialize_line_id">
+    <brief> initializes line_id with given data</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="initialize_line_id::ptr_hash" name="ptr_hash">
+      <doc>pointer to str_hash value</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="initialize_line_id::ptr_length" name="ptr_length">
+      <doc>pointer to str_length value</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="initialize_line_id::sws" name="sws">
+      <doc>pointer to pointer to string_with_size to initialize from</doc>
+      <type name="string_with_size" qualifier="**" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="initialize_line_id::ptr_past_k_chars" name="ptr_past_k_chars">
+      <doc>whether the line in file is longer than a threshold</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+  </function>
+  <function id="if_within_first_section_write_to_string" name="if_within_first_section_write_to_string">
+    <brief> if within treshold of line length, write to given string</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="if_within_first_section_write_to_string::ptr_line_length" name="ptr_line_length">
+      <doc>current length of line</doc>
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+    <argument id="if_within_first_section_write_to_string::sws_first_chars" name="sws_first_chars">
+      <doc>current string to be written to</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="if_within_first_section_write_to_string::sws_block" name="sws_block">
+      <doc>raw input string read from file</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="if_within_first_section_write_to_string::ptr_index" name="ptr_index">
+      <doc>index into string</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="write_string_and_update_hash_and_line_length" name="write_string_and_update_hash_and_line_length">
+    <brief> write character to string, and update a given hash and line length</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_string_and_update_hash_and_line_length::ptr_line_length" name="ptr_line_length">
+      <doc>pointer to current length of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::sws_first_chars" name="sws_first_chars">
+      <doc>pointer to string_with_size containing first k chars of line</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::sws_block" name="sws_block">
+      <doc>raw input string read from file</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::ptr_index" name="ptr_index">
+      <doc>current index into string</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::instantaneous_hash" name="instantaneous_hash">
+      <doc>hash at this point in string (using moving djb2 hash)</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::hash_str" name="hash_str">
+      <doc>string to hash with</doc>
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="write_string_and_update_hash_and_line_length::ptr_past_k_chars" name="ptr_past_k_chars">
+      <doc>whether string is past a threshold length</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+  </function>
+  <function id="check_if_past_k_chars_push_tail_and_initialize_line_id" name="check_if_past_k_chars_push_tail_and_initialize_line_id">
+    <brief> if past k chars, finish off initializing line_id</brief>
+    <doc>OPTIMIZATION: string probably ok to allocate in loop, but perhaps not
+</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::ptr_past_k_chars" name="ptr_past_k_chars">
+      <doc>whether past k chars</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::ptr_line_length" name="ptr_line_length">
+      <doc>current length of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::ids_queue" name="ids_queue">
+      <doc>queue of line_ids to push to</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::ptr_line_hash" name="ptr_line_hash">
+      <doc>current hash of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::first_few_chars" name="first_few_chars">
+      <doc>pointer to pointer to string_with_size with first k chars</doc>
+      <type name="string_with_size" qualifier="**" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::lines_processed" name="lines_processed">
+      <doc>current lines processed of file</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="check_if_past_k_chars_push_tail_and_initialize_line_id::is_line_orf" name="is_line_orf">
+      <doc>whether line is open reading frame</doc>
+      <type builtin="yes" name="bool" />
+    </argument>
+  </function>
+  <function id="is_first_line_orf" name="is_first_line_orf">
+    <brief> helper function to ask whether line is an orf</brief>
+    <doc>requires that string be &gt;= CODON_LENGTH chars, which needs to be TODO: fixed
+requires that file be formatted correctly so that lines of orf and non orf
+alternate, but vcsfmt already enforces that
+
+</doc>
+    <return>
+      <doc>whether line begins with a start codon</doc>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="is_first_line_orf::first_few_chars" name="first_few_chars">
+      <doc>first chars of line</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="react_to_next_character_of_block" name="react_to_next_character_of_block">
+    <brief> update hash and string length, or push constructed line_id to queue</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="react_to_next_character_of_block::input_block" name="input_block">
+      <doc>string_with_size to analyze</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="react_to_next_character_of_block::block_index" name="block_index">
+      <doc>current index into block</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+    <argument id="react_to_next_character_of_block::lines_processed" name="lines_processed">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="react_to_next_character_of_block::is_line_orf" name="is_line_orf">
+      <doc>whether line is orf</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="react_to_next_character_of_block::first_few_chars" name="first_few_chars">
+      <doc>pointer to pointer to string_with_size containg first k
+characters of line</doc>
+      <type name="string_with_size" qualifier="**" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="react_to_next_character_of_block::ptr_past_k_chars" name="ptr_past_k_chars">
+      <doc>whether line is greater than k characters in length</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="react_to_next_character_of_block::ptr_line_length" name="ptr_line_length">
+      <doc>current length of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="react_to_next_character_of_block::ids_queue" name="ids_queue">
+      <doc>queue to push line_id to as required</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="react_to_next_character_of_block::ptr_line_hash" name="ptr_line_hash">
+      <doc>current hash of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+  </function>
+  <function id="add_blocks_to_queue" name="add_blocks_to_queue">
+    <brief> read blocks from file and add as line_ids to a queue</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="add_blocks_to_queue::active_file" name="active_file">
+      <doc>file to read from</doc>
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::ids_queue" name="ids_queue">
+      <doc>queue to push to</doc>
+      <type name="GQueue" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::input_block" name="input_block">
+      <doc>memory block to use for file I/O</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="add_blocks_to_queue::ptr_past_k_chars" name="ptr_past_k_chars">
+      <doc>whether line is greater than k characters long</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::ptr_line_length" name="ptr_line_length">
+      <doc>current length of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::ptr_line_hash" name="ptr_line_hash">
+      <doc>current hash of line</doc>
+      <type builtin="yes" name="unsigned long" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::first_few_chars" name="first_few_chars">
+      <doc>pointer to pointer to string_with_size containing first k
+characters of line</doc>
+      <type name="string_with_size" qualifier="**" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="add_blocks_to_queue::lines_processed" name="lines_processed">
+      <doc>lines processed of active_file</doc>
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="add_blocks_to_queue::is_line_orf" name="is_line_orf">
+      <doc>whether line is an orf</doc>
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+  </function>
+  <structtemplate name="diff_file_trio_with_indices" ref="queue_processing::diff_file_trio_with_indices#queue_processing::diff_file_trio_with_indices">
+    <brief>helper struct used for glib for_each</brief>
+  </structtemplate>
+  <function id="optimal_levenshtein_string_between_lines" name="optimal_levenshtein_string_between_lines">
+    <brief> get optimal levenshtein distance string between current lines of two files</brief>
+    <return>
+      <doc>string_with_size representing the two</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="optimal_levenshtein_string_between_lines::prev_file" name="prev_file">
+      <doc>FILE * to prev file at beginning of intended line</doc>
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="optimal_levenshtein_string_between_lines::cur_file" name="cur_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+  <function id="vcscmp" name="vcscmp">
+    <brief> compare two vcsfmt files and output to given file</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="vcscmp::prev_filename" name="prev_filename">
+      <doc>name of prev file</doc>
+      <type builtin="yes" name="char" qualifier=" const *" />
+    </argument>
+    <argument id="vcscmp::cur_filename" name="cur_filename">
+      <doc>name of cur file</doc>
+      <type builtin="yes" name="char" qualifier=" const *" />
+    </argument>
+    <argument id="vcscmp::out_filename" name="out_filename">
+      <doc>name of output file</doc>
+      <type builtin="yes" name="char" qualifier=" const *" />
+    </argument>
+  </function>
+</category>

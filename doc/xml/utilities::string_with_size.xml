@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<category id="utilities::string_with_size" name="string_with_size" xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <structtemplate name="string_with_size" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size">
+    <brief> used to return a char string, along with size information</brief>
+  </structtemplate>
+  <function id="make_new_string_with_size" name="make_new_string_with_size">
+    <brief> constructs new string_with_size of given size_in_memory</brief>
+    <doc>sets readable_bytes to 0
+
+</doc>
+    <return>
+      <doc>constructed string_with_size</doc>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="make_new_string_with_size::size_in_memory" name="size_in_memory">
+      <doc>size of string_with_size to create</doc>
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="free_string_with_size" name="free_string_with_size">
+    <brief> deallocates memory used by a string_with_size</brief>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="free_string_with_size::arg" name="arg">
+      <doc>string_with_size to free</doc>
+      <type builtin="yes" name="void" qualifier="*" />
+    </argument>
+  </function>
+</category>

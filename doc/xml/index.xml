@@ -1,0 +1,392 @@
+<?xml version='1.0' encoding='utf-8'?>
+<index xmlns="http://jessevdk.github.com/cldoc/1.0">
+  <variable id="argp" name="argp">
+    <type name="argp" />
+  </variable>
+  <variable id="args_doc" name="args_doc">
+    <type name="args_doc" />
+  </variable>
+  <variable id="doc" name="doc">
+    <type name="doc" />
+  </variable>
+  <variable id="FASTA_LINE_LENGTH" name="FASTA_LINE_LENGTH">
+    <brief>left non-const so it can be modified at runtime with argv</brief>
+    <type builtin="yes" name="unsigned long long" />
+  </variable>
+  <category name="line_id" ref="line_id#line_id">
+    <structtemplate name="line_id" ref="line_id::line_id#line_id::line_id">
+      <brief> aggregate structure representing the identity of a line</brief>
+    </structtemplate>
+  </category>
+  <variable id="options" name="options">
+    <brief>documentation</brief>
+    <type name="options" />
+  </variable>
+  <category name="queue_processing" ref="queue_processing#queue_processing">
+    <structtemplate name="boolean_and_data" ref="queue_processing::boolean_and_data#queue_processing::boolean_and_data">
+      <brief>helper struct used in glib for_each loops</brief>
+    </structtemplate>
+    <structtemplate name="line_id_pair" ref="queue_processing::line_id_pair#queue_processing::line_id_pair">
+      <brief>helper struct to carry a pair of line_ids around</brief>
+    </structtemplate>
+    <structtemplate name="line_id_with_edit_match_info" ref="queue_processing::line_id_with_edit_match_info#queue_processing::line_id_with_edit_match_info">
+      <brief>helper struct to carry line_id and edit matching info in glib for_each</brief>
+    </structtemplate>
+    <structtemplate name="diff_file_trio_with_indices" ref="queue_processing::diff_file_trio_with_indices#queue_processing::diff_file_trio_with_indices">
+      <brief>helper struct used for glib for_each</brief>
+    </structtemplate>
+  </category>
+  <variable id="start_codons" name="start_codons">
+    <brief>TODO: javadoc, maybe make inline somehow?</brief>
+    <type name="start_codons" />
+  </variable>
+  <variable id="stop_codons" name="stop_codons">
+    <brief>TODO: javadoc</brief>
+    <type name="stop_codons" />
+  </variable>
+  <category name="utilities" ref="utilities#utilities">
+    <category name="file functions" ref="utilities::file functions#utilities::file functions" />
+    <category name="string_with_size" ref="utilities::string_with_size#utilities::string_with_size">
+      <structtemplate name="string_with_size" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size">
+        <brief> used to return a char string, along with size information</brief>
+      </structtemplate>
+    </category>
+  </category>
+  <category name="vcsfmt" ref="vcsfmt#vcsfmt" />
+  <structtemplate name="dwndiff_arguments" ref="dwndiff_arguments#dwndiff_arguments">
+    <brief>used to communicate with parse_opt</brief>
+  </structtemplate>
+  <structtemplate name="levenshtein_matrix_state" ref="levenshtein_matrix_state#levenshtein_matrix_state" />
+  <structtemplate name="string_with_size_and_index" ref="string_with_size_and_index#string_with_size_and_index" />
+  <enum anonymous="yes" id="(anonymous::1)" name="(anonymous::1)">
+    <enumvalue id="leven_insertion" name="leven_insertion" value="0" />
+    <enumvalue id="leven_deletion" name="leven_deletion" value="1" />
+    <enumvalue id="leven_substitution" name="leven_substitution" value="2" />
+    <enumvalue id="leven_matching" name="leven_matching" value="3" />
+    <enumvalue id="leven_complete" name="leven_complete" value="4" />
+  </enum>
+  <typedef name="levenshtein_string_edit_operation" ref="levenshtein_string_edit_operation#levenshtein_string_edit_operation">
+    <type name="levenshtein_string_edit_operation" ref="index#(anonymous::1)" />
+  </typedef>
+  <function id="advance_file_to_line" name="advance_file_to_line">
+    <brief>CLOBBERS CUR_LINE BY SETTING EQUAL TO FINAL_LINE</brief>
+    <doc>starts again from beginning of file if final_line &lt; cur_line</doc>
+    <return>
+      <type name="FILE" qualifier="*" />
+    </return>
+    <argument id="advance_file_to_line::file" name="file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="advance_file_to_line::cur_line" name="cur_line">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="advance_file_to_line::final_line" name="final_line">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="advance_file_to_line::block_size" name="block_size">
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="de_process_block_vcsfmt" name="de_process_block_vcsfmt">
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="de_process_block_vcsfmt::input_block_with_size" name="input_block_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="de_process_block_vcsfmt::output_block_with_size" name="output_block_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="de_process_block_vcsfmt::cur_posn_in_line" name="cur_posn_in_line">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+  </function>
+  <function id="djb2_hash_on_string_index" name="djb2_hash_on_string_index">
+    <return>
+      <type builtin="yes" name="unsigned long" />
+    </return>
+    <argument id="djb2_hash_on_string_index::instantaneous_hash" name="instantaneous_hash">
+      <type builtin="yes" name="unsigned long" />
+    </argument>
+    <argument id="djb2_hash_on_string_index::str" name="str">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="djb2_hash_on_string_index::cur_index" name="cur_index">
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="equal_to_mpz_t" name="equal_to_mpz_t">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="equal_to_mpz_t::lhs" name="lhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="equal_to_mpz_t::rhs" name="rhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+  </function>
+  <function id="format_and_free_levenshtein_list_to_string_with_size" name="format_and_free_levenshtein_list_to_string_with_size">
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="format_and_free_levenshtein_list_to_string_with_size::operations_backtrace" name="operations_backtrace">
+      <type name="GSList" qualifier="*" />
+    </argument>
+  </function>
+  <function id="get_current_line_of_file" name="get_current_line_of_file">
+    <brief>assumes file is at beginning of required line</brief>
+    <doc>puts file pointer back where it started</doc>
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="get_current_line_of_file::source_file" name="source_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+  <function id="get_levenshtein_distance" name="get_levenshtein_distance">
+    <brief>precondition: strings are same size</brief>
+    <return>
+      <type builtin="yes" name="unsigned long long" />
+    </return>
+    <argument id="get_levenshtein_distance::prev_string" name="prev_string">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="get_levenshtein_distance::cur_string" name="cur_string">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="get_levenshtein_edits_and_free" name="get_levenshtein_edits_and_free">
+    <brief>http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm</brief>
+    <doc>returns GSList * of chars inserted/deleted/substituted and at which
+positions
+NOTE: FREES STRING_WITH_SIZES GIVEN AS INPUT</doc>
+    <return>
+      <type name="GSList" qualifier="*" />
+    </return>
+    <argument id="get_levenshtein_edits_and_free::prev_string" name="prev_string">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="get_levenshtein_edits_and_free::cur_string" name="cur_string">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="increment_mpz_t" name="increment_mpz_t">
+    <return>
+      <type name="mpz_t" qualifier="*" />
+    </return>
+    <argument id="increment_mpz_t::in" name="in">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+  </function>
+  <function id="is_comment_in_codon" name="is_comment_in_codon">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="is_comment_in_codon::codon" name="codon">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+  </function>
+  <function id="is_start_codon" name="is_start_codon">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="is_start_codon::codon" name="codon">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+  </function>
+  <function id="is_stop_codon" name="is_stop_codon">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="is_stop_codon::codon" name="codon">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+  </function>
+  <function id="less_than_mpz_t" name="less_than_mpz_t">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="less_than_mpz_t::lhs" name="lhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="less_than_mpz_t::rhs" name="rhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+  </function>
+  <function id="less_than_or_equal_to_mpz_t" name="less_than_or_equal_to_mpz_t">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="less_than_or_equal_to_mpz_t::lhs" name="lhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="less_than_or_equal_to_mpz_t::rhs" name="rhs">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+  </function>
+  <function id="min_of_non_null_three" name="min_of_non_null_three">
+    <return>
+      <type builtin="yes" name="unsigned long long" />
+    </return>
+    <argument id="min_of_non_null_three::x" name="x">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="min_of_non_null_three::y" name="y">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="min_of_non_null_three::z" name="z">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+  </function>
+  <function id="parse_opt" name="parse_opt">
+    <return>
+      <type name="error_t" />
+    </return>
+    <argument id="parse_opt::key" name="key">
+      <type builtin="yes" name="int" />
+    </argument>
+    <argument id="parse_opt::arg" name="arg">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="parse_opt::state" name="state">
+      <type name="argp_state" qualifier="*" />
+    </argument>
+  </function>
+  <function id="process_block_vcsfmt" name="process_block_vcsfmt">
+    <brief>*</brief>
+    <doc>Given a continuous stream of DNA characters, this function will insert
+ newline characters in between genes and junk DNA. In other words, each line
+ in the output will be either a gene or junk DNA.
+
+ This function expects the input to only contain DNA characters (no new lines
+ or anything else).
+
+ This function is also written to be able to process data in multiple
+ chunks. If multiple calls are made to this function for different chunks of
+ the same data, the same parameters should be passed in each call. This will
+ let the function remember key information about the last chunk it processed.
+</doc>
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="process_block_vcsfmt::input_block_with_size" name="input_block_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="process_block_vcsfmt::output_block_with_size" name="output_block_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="process_block_vcsfmt::is_within_orf" name="is_within_orf">
+      <type builtin="yes" name="bool" qualifier="*" />
+    </argument>
+    <argument id="process_block_vcsfmt::cur_orf_pos" name="cur_orf_pos">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="process_block_vcsfmt::current_codon_frame" name="current_codon_frame">
+      <type builtin="yes" name="char" qualifier="*" />
+    </argument>
+    <argument id="process_block_vcsfmt::is_final_block" name="is_final_block">
+      <type builtin="yes" name="bool" />
+    </argument>
+  </function>
+  <function id="read_block" name="read_block">
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="read_block::input_file" name="input_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="read_block::input_string_with_size" name="input_string_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="read_block_with_offset" name="read_block_with_offset">
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="read_block_with_offset::input_file" name="input_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="read_block_with_offset::input_string_with_size" name="input_string_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+    <argument id="read_block_with_offset::size_to_read" name="size_to_read">
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+    <argument id="read_block_with_offset::offset" name="offset">
+      <type builtin="yes" name="unsigned long long" />
+    </argument>
+  </function>
+  <function id="three_not_null" name="three_not_null">
+    <return>
+      <type builtin="yes" name="bool" />
+    </return>
+    <argument id="three_not_null::x" name="x">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="three_not_null::y" name="y">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+    <argument id="three_not_null::z" name="z">
+      <type builtin="yes" name="unsigned long long" qualifier="*" />
+    </argument>
+  </function>
+  <function id="write_block" name="write_block">
+    <return>
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </return>
+    <argument id="write_block::output_file" name="output_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_block::output_block_with_size" name="output_block_with_size">
+      <type name="string_with_size" qualifier="*" ref="utilities::string_with_size::string_with_size#utilities::string_with_size::string_with_size" />
+    </argument>
+  </function>
+  <function id="write_current_line_of_file" name="write_current_line_of_file">
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_current_line_of_file::source_file" name="source_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_current_line_of_file::dest_file" name="dest_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+  <function id="write_current_line_of_file_incf_index" name="write_current_line_of_file_incf_index">
+    <brief>CLOBBERS FROM_LINE_NUMBER (increments)</brief>
+    <doc>SETS FILE POINTER TO FIRST CHARACTER OF *NEXT* LINE
+INCLUDES NEWLINE</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_current_line_of_file_incf_index::from_line_number" name="from_line_number">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_current_line_of_file_incf_index::source_file" name="source_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_current_line_of_file_incf_index::dest_file" name="dest_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+  <function id="write_line_number_from_file_to_file" name="write_line_number_from_file_to_file">
+    <brief>CLOBBERS FROM_LINE_NUMBER</brief>
+    <doc>i.e. sets it equal to to_line_number + 1</doc>
+    <return>
+      <type builtin="yes" name="void" />
+    </return>
+    <argument id="write_line_number_from_file_to_file::from_line_number" name="from_line_number">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_line_number_from_file_to_file::to_line_number" name="to_line_number">
+      <type name="mpz_t" qualifier="*" />
+    </argument>
+    <argument id="write_line_number_from_file_to_file::source_file" name="source_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+    <argument id="write_line_number_from_file_to_file::dest_file" name="dest_file">
+      <type name="FILE" qualifier="*" />
+    </argument>
+  </function>
+</index>
