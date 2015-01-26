@@ -24,10 +24,10 @@ void vcsfmt(char * filename, char * output_file_path) {
   FILE * output_file = create_file_binary_write(full_out_file_path);
   PRINT_ERROR_AND_RETURN_IF_NULL(output_file, "Error in creating output file.");
 
+#ifndef CONCURRENT
   string_with_size * input_block_with_size =
    make_new_string_with_size(BLOCK_SIZE);
 
-#ifndef CONCURRENT
   string_with_size * output_block_with_size =
    make_new_string_with_size(BIN_BLOCK_SIZE);
 #endif
@@ -42,6 +42,11 @@ void vcsfmt(char * filename, char * output_file_path) {
   }
 
 #ifdef CONCURRENT
+#ifdef MEMPOOL
+  // create string_with_size memory pools
+  add_string_with_size_pool(BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
+  add_string_with_size_pool(BIN_BLOCK_SIZE, STARTING_NUM_SWS_IN_POOL);
+#endif
   GAsyncQueue * read_queue = g_async_queue_new();
   GAsyncQueue * write_queue = g_async_queue_new();
   volatile bool * is_reading_complete = malloc(sizeof(bool));
@@ -96,16 +101,11 @@ void vcsfmt(char * filename, char * output_file_path) {
    "write_block_thread", (GThreadFunc) concurrent_write_block_vcsfmt,
    args_to_write_block);
 
-  PRINT_ERROR("GETS HERE1");
-
   // we know the threads will line up this way
   // because of the queue pipelines
   g_thread_join(read_block_thread);
-  PRINT_ERROR("GETS HERE2");
   g_thread_join(process_block_thread);
-  PRINT_ERROR("GETS HERE3");
   g_thread_join(write_block_thread);
-  PRINT_ERROR("GETS HERE4");
 
 #else
 
@@ -120,6 +120,7 @@ void vcsfmt(char * filename, char * output_file_path) {
                  cur_orf_pos, current_codon_frame, feof(input_file)));
   }
 
+#endif
   // error handling
   if (ferror(input_file) && !feof(input_file)) {
     PRINT_ERROR("Error in reading from input file.");
@@ -131,7 +132,6 @@ void vcsfmt(char * filename, char * output_file_path) {
     PRINT_ERROR("Unknown error in vcsfmt.");
   }
 
-#endif
 // cleanup allocated memory and open handles
 #ifdef CONCURRENT
   // TODO: fix mutex and thread memory leaks (if they actually exist???)
@@ -140,12 +140,11 @@ void vcsfmt(char * filename, char * output_file_path) {
   // TODO: don't leak mem
   g_mutex_clear(read_complete_mutex);
   g_mutex_clear(process_complete_mutex);
-#endif
-  free(output_file_name);
+#else
   free_string_with_size(input_block_with_size);
-#ifndef CONCURRENT
   free_string_with_size(output_block_with_size);
 #endif
+  free(output_file_name);
   // close open handles
   fclose(input_file);
   fclose(output_file);

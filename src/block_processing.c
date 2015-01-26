@@ -277,7 +277,12 @@ string_with_size * de_process_block_vcsfmt(string_with_size * input_block,
 #ifdef CONCURRENT
 void concurrent_read_block_vcsfmt(concurrent_read_block_args_vcsfmt * args) {
   while (!feof(args->input_file) && !ferror(args->input_file)) {
+#ifdef MEMPOOL
+    args->input_block_with_size =
+     make_new_string_with_size_from_pool(INPUT_BLOCK_MEMPOOL_INDEX);
+#else
     args->input_block_with_size = make_new_string_with_size(BLOCK_SIZE);
+#endif
     read_block(args->input_file, args->input_block_with_size);
     if (feof(args->input_file)) {
       g_mutex_lock(args->read_complete_mutex);
@@ -292,22 +297,38 @@ void concurrent_process_block_vcsfmt(
  concurrent_process_block_args_vcsfmt * args) {
   while (!is_last_read_block_vcsfmt_concurrent(args)) {
     args->input_block_with_size = g_async_queue_pop(args->read_queue);
-    // OPTIMIZATION: allocate from (possibly self-growing) pool of memory to
-    // avoid time of malloc'ing and free'ing
+#ifdef MEMPOOL
+    args->output_block_with_size =
+     make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX);
+#else
     args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
+#endif
     process_block_vcsfmt(args->input_block_with_size,
                          args->output_block_with_size, args->is_within_orf,
                          args->cur_orf_pos, args->current_codon_frame, false);
     g_async_queue_push(args->write_queue, args->output_block_with_size);
+#ifdef MEMPOOL
+    free_string_with_size_to_pool(args->input_block_with_size);
+#else
     free_string_with_size(args->input_block_with_size); // let's not leak memory
+#endif
   }
   args->input_block_with_size = g_async_queue_pop(args->read_queue);
+#ifdef MEMPOOL
+  args->output_block_with_size =
+   make_new_string_with_size_from_pool(OUTPUT_BLOCK_MEMPOOL_INDEX);
+#else
   args->output_block_with_size = make_new_string_with_size(BIN_BLOCK_SIZE);
+#endif
   process_block_vcsfmt(args->input_block_with_size,
                        args->output_block_with_size, args->is_within_orf,
                        args->cur_orf_pos, args->current_codon_frame, true);
   g_async_queue_push(args->write_queue, args->output_block_with_size);
+#ifdef MEMPOOL
+  free_string_with_size_to_pool(args->input_block_with_size);
+#else
   free_string_with_size(args->input_block_with_size);
+#endif
   g_mutex_lock(args->process_complete_mutex);
   *args->is_processing_complete = true;
   g_mutex_unlock(args->process_complete_mutex);
@@ -317,7 +338,6 @@ bool is_last_read_block_vcsfmt_concurrent(
  concurrent_process_block_args_vcsfmt * args) {
   if (g_async_queue_length(args->read_queue) > 1) {
     return false;
-    // } else if (g_async_queue_length(args->read_queue) == 1) {
   } else {
     bool result;
     g_mutex_lock(args->read_complete_mutex);
@@ -332,23 +352,21 @@ void concurrent_write_block_vcsfmt(concurrent_write_block_args_vcsfmt * args) {
     args->output_block_with_size =
      (string_with_size *) g_async_queue_pop(args->write_queue);
     write_block(args->output_file, args->output_block_with_size);
+#ifdef MEMPOOL
+    free_string_with_size_to_pool(args->output_block_with_size);
+#else
     free_string_with_size(args->output_block_with_size);
+#endif
   }
-  // get the rest left over (if any)
-  unsigned long long queue_len;
-  queue_len = g_async_queue_length(args->write_queue);
-  for (unsigned long long queue_size = queue_len; queue_size != 0;
-       --queue_size) {
-    args->output_block_with_size =
-     (string_with_size *) g_async_queue_pop(args->write_queue);
-    write_block(args->output_file, args->output_block_with_size);
-    free_string_with_size(args->output_block_with_size);
+  if (g_async_queue_length(args->write_queue) > 0) {
+    PRINT_ERROR("SHOULD NEVER BE HERE");
+    exit(-1);
   }
 }
 
 bool is_processing_complete_vcsfmt_concurrent(
  concurrent_write_block_args_vcsfmt * args) {
-  if (g_async_queue_length(args->write_queue) != 0) {
+  if (g_async_queue_length(args->write_queue) > 0) {
     return false;
   } else {
     // OPTIMIZATION: make this variable static somehow
