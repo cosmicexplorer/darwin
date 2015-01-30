@@ -1,9 +1,7 @@
 # keep random downloaded info out of it
 infos/
 # keep large files meant for testing out of it
-# mvp_testing/
-mvp_testing/homo_sapiens_chromosome_7.fasta
-mvp_testing/GCA_000001405.15_GRCh38_top-level.fna
+mvp_testing/
 # don't add generated object files
 bin/*.o
 # generated files from processing, wherever they may be

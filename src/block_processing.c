@@ -1,5 +1,7 @@
 #include "block_processing.h"
 
+// OPTIMIZATION: use readahead to cache file contents over multiple freads!!!!
+
 string_with_size * read_block(FILE * input_file,
                               string_with_size * input_string_with_size) {
   input_string_with_size->readable_bytes =
@@ -320,9 +322,11 @@ void concurrent_process_block_vcsfmt(
     free_string_with_size(args->input_block_with_size); // let's not leak memory
 #endif
   }
+#ifdef DEBUG
   if (g_async_queue_length(args->read_queue) != 1) {
     PRINT_ERROR("THIS SHOULD NEVER HAPPEN");
   }
+#endif
   args->input_block_with_size = g_async_queue_pop(args->read_queue);
 #ifdef MEMPOOL
   args->output_block_with_size =
@@ -346,9 +350,11 @@ void concurrent_process_block_vcsfmt(
 
 bool is_last_read_block_vcsfmt_concurrent(
  concurrent_process_block_args_vcsfmt * args) {
+#ifdef DEBUG
   if (g_async_queue_length(args->read_queue) == 0) {
     PRINT_ERROR("THIS IS WHAT CAUSED THE THING THAT SHOULD NEVER HAPPEN");
   }
+#endif
   if (g_async_queue_length(args->read_queue) > 1) {
     return false;
   } else {

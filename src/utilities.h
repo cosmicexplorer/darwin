@@ -109,6 +109,9 @@ typedef struct {
 #define INPUT_BLOCK_MEMPOOL_INDEX_DE_VCSFMT 0
 #define OUTPUT_BLOCK_MEMPOOL_INDEX_DE_VCSFMT 1
 
+// TODO: use this so that mem pools don't become overly large
+#define MAX_MEMPOOL_LENGTH 2000
+
 typedef struct {
   /* pointer to character string, NOT null-terminated! */
   char * string;

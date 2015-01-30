@@ -45,7 +45,7 @@ env.Append(CPPDEFINES = env.cleanup_mode)
 env.Append(CCFLAGS = ['-std=c11'])
 # optimization for debug vs release
 if (env.build_mode == 'DEBUG'):
-    env.Replace(CC = 'gcc')   # i KNOW it's a bad idea to change compilers for
+    # i KNOW it's a bad idea to change compilers for
     # debug and release, but clang is a LOT better at producing errors, and gcc
     # is better at producing faster code, which is important for this project
     env.Append(CCFLAGS = ['-O0','-ggdb','-g3','-Wall','-Wextra','-Werror'])
@@ -74,7 +74,8 @@ if (env.build_mode == 'DEBUG'):
         env.Replace(CC = 'clang')
 elif (env.build_mode == 'RELEASE'):
     env.Replace(CC = 'gcc')
-    env.Append(CCFLAGS = ['-Ofast','-finline-functions',
+    env.Append(CCFLAGS = ['-Ofast',
+                          '-finline-functions',
                           '-funsafe-loop-optimizations',
                           '-Wunsafe-loop-optimizations',
                           '-funroll-loops']) # TODO: ADD MARCH OPTIONS
